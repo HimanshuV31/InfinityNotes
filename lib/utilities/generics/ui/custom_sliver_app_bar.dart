@@ -29,8 +29,10 @@ class CustomSliverAppBar extends StatefulWidget {
   final bool autoShowSearch;
   final VoidCallback? onLogout;
   final VoidCallback? onProfile;
-  final VoidCallback? onSettings
-  ;
+  final VoidCallback? onSettings;
+  final VoidCallback? onReportBug;
+  final VoidCallback? onFeedback;
+
   const CustomSliverAppBar({
     super.key,
     this.title,
@@ -55,6 +57,8 @@ class CustomSliverAppBar extends StatefulWidget {
     this.onLogout,
     this.onProfile,
     this.onSettings,
+    this.onFeedback,
+    this.onReportBug,
   });
 
   @override
@@ -247,19 +251,21 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
               showCustomToast(context,'⚙️ Settings feature coming soon!');
               debugPrint('⚙️ Settings feature coming soon!');
             },
+            onReportBug: widget.onReportBug,
+            onFeedback: widget.onFeedback
           );
         },
         child: Container(
           padding: const EdgeInsets.all(3),
           decoration: BoxDecoration(
-            color: Colors.black.withAlpha(255), //  Increased from 80 to 100
+            color: Colors.black.withAlpha(255),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white.withAlpha(200), width: 1.5), //  Increased from 90 to 200
+            border: Border.all(color: Colors.white.withAlpha(200), width: 1.5),
             boxShadow: UIConstants.strongShadow,
           ),
           child: CircleAvatar(
             radius: 16,
-            backgroundColor: Colors.cyan.withAlpha(40), //  Increased from 20 to 40
+            backgroundColor: Colors.cyan.withAlpha(40),
             child: Text(
               widget.userEmail.isNotEmpty
                   ? widget.userEmail[0].toUpperCase()
@@ -276,6 +282,4 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
       ),
     );
   }
-
 }
-

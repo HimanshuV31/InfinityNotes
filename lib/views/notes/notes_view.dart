@@ -13,13 +13,14 @@ import 'package:infinity_notes/services/auth/bloc/auth_state.dart';
 import 'package:infinity_notes/services/cloud/cloud_note.dart';
 import 'package:infinity_notes/services/cloud/firebase_cloud_storage.dart';
 import 'package:infinity_notes/services/notes_actions/handle_long_press_note.dart';
+// import 'package:infinity_notes/services/feedback/emailjs_feedback_service.dart';
 import 'package:infinity_notes/services/search/bloc/search_bloc.dart';
 import 'package:infinity_notes/services/search/bloc/search_event.dart';
 import 'package:infinity_notes/services/search/bloc/search_state.dart';
-import 'package:infinity_notes/utilities/generics/ui/background_image.dart';
 import 'package:infinity_notes/utilities/generics/ui/custom_sliver_app_bar.dart';
 import 'package:infinity_notes/utilities/generics/ui/custom_toast.dart';
 import 'package:infinity_notes/utilities/generics/ui/dialogs.dart';
+import 'package:infinity_notes/utilities/generics/ui/feedback_dialog.dart';
 import 'package:infinity_notes/utilities/generics/ui/ui_constants.dart';
 import 'package:infinity_notes/views/notes/notes_list_view.dart';
 import 'package:infinity_notes/views/notes/notes_tile_view.dart';
@@ -31,9 +32,10 @@ class NotesView extends StatefulWidget {
   State<NotesView> createState() => _NotesViewState();
 }
 
-class _NotesViewState extends State<NotesView>{
+class _NotesViewState extends State<NotesView> {
   String get userEmail => AuthService.firebase().currentUser!.email;
   late final FirebaseCloudStorage _notesService;
+
   String get userId => AuthService.firebase().currentUser!.id;
   CloseDialog? _closeDialogHandle;
   late bool _showListView = false;
@@ -101,34 +103,32 @@ class _NotesViewState extends State<NotesView>{
         },
         child: Stack(
           children: [
-            const BackgroundImage(),
+            // const BackgroundImage(),
             Scaffold(
-              backgroundColor: Colors.transparent,
+              backgroundColor: Colors.blueGrey,
               body: SafeArea(
                 child: StreamBuilder<Iterable<CloudNote>>(
                   stream: _notesService.allNotes(ownerUserId: userId),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                      return const Center(child: CircularProgressIndicator());
                     }
                     if (snapshot.hasError) {
-                      return Center(
-                        child: Text("Error: ${snapshot.error}"),
-                      );
+                      return Center(child: Text("Error: ${snapshot.error}"));
                     }
                     final allNotes = snapshot.data ?? <CloudNote>[];
                     final hasNotes = allNotes.isNotEmpty;
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (hasNotes && _searchBloc.state is SearchInitial) {
                         _searchBloc.add(SearchInitiated(allNotes));
-                        debugPrint("🔍 Post-frame: Initialized SearchBloc with ${allNotes.length} notes");
+                        debugPrint(
+                          "🔍 Post-frame: Initialized SearchBloc with ${allNotes.length} notes",
+                        );
                       }
                     });
                     return CustomScrollView(
                       slivers: [
-                        // AppBar
+                        // AppBar with ALL callbacks including bug report
                         CustomSliverAppBar(
                           title: "Infinity Notes",
                           userEmail: userEmail,
@@ -141,15 +141,16 @@ class _NotesViewState extends State<NotesView>{
                           onLogout: () => _handleMenuAction(MenuAction.logout),
                           onSearchChanged: (query) =>
                               _searchBloc.add(SearchQueryChanged(query)),
+
+                          // ✅ ADD THESE TWO NEW CALLBACKS
+                          onReportBug: _handleReportBug,
+                          onFeedback: _handleFeedback,
                         ),
 
-                        //  Notes with proper Sliver implementation
+                        // Notes with proper Sliver implementation
                         BlocBuilder<SearchBloc, SearchState>(
                           builder: (context, searchState) {
-                            return _buildNotesContent(
-                              allNotes,
-                              searchState,
-                            );
+                            return _buildNotesContent(allNotes, searchState);
                           },
                         ),
                       ],
@@ -169,10 +170,7 @@ class _NotesViewState extends State<NotesView>{
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15),
-                    side: BorderSide(
-                      color: themeColor,
-                      width: 2,
-                    ),
+                    side: BorderSide(color: themeColor, width: 2),
                   ),
                   child: Icon(
                     Icons.add,
@@ -206,11 +204,27 @@ class _NotesViewState extends State<NotesView>{
     }
   }
 
+  Future<void> _handleReportBug() async {
+    await showFeedbackDialog(
+      context: context,
+      type: FeedbackType.bugReport,
+      userEmail: userEmail,
+    );
+  }
+
+  Future<void> _handleFeedback() async {
+    await showFeedbackDialog(
+      context: context,
+      type: FeedbackType.generalFeedback,
+      userEmail: userEmail,
+    );
+  }
+
   // Sliver implementation
   Widget _buildNotesContent(
-      Iterable<CloudNote> allNotes,
-      SearchState searchState,
-      ) {
+    Iterable<CloudNote> allNotes,
+    SearchState searchState,
+  ) {
     debugPrint("🔍 _buildNotesContent: searchState = $searchState");
     Iterable<CloudNote> notesToShow;
 
@@ -220,9 +234,13 @@ class _NotesViewState extends State<NotesView>{
 
         // ✅ FIX: Filter cached results against live allNotes to remove deleted ones
         final liveNoteIds = allNotes.map((n) => n.documentId).toSet();
-        notesToShow = state.results.where((note) => liveNoteIds.contains(note.documentId));
+        notesToShow = state.results.where(
+          (note) => liveNoteIds.contains(note.documentId),
+        );
 
-        debugPrint("🔍 Showing ${notesToShow.length} search results for '${state.query}'");
+        debugPrint(
+          "🔍 Showing ${notesToShow.length} search results for '${state.query}'",
+        );
 
         // ✅ If all search results were deleted, show empty
         if (notesToShow.isEmpty) {
@@ -266,7 +284,9 @@ class _NotesViewState extends State<NotesView>{
       case SearchInitial:
         final state = searchState as SearchInitial;
         notesToShow = state.notes.isNotEmpty ? state.notes : allNotes;
-        debugPrint("🔍 Showing all ${notesToShow.length} notes (initial state)");
+        debugPrint(
+          "🔍 Showing all ${notesToShow.length} notes (initial state)",
+        );
         break;
 
       default:

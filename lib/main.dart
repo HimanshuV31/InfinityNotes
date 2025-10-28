@@ -7,6 +7,7 @@ import 'package:infinity_notes/services/auth/bloc/auth_bloc.dart';
 import 'package:infinity_notes/services/auth/bloc/auth_event.dart';
 import 'package:infinity_notes/services/auth/bloc/auth_state.dart';
 import 'package:infinity_notes/services/auth/firebase_auth_provider.dart';
+import 'package:infinity_notes/services/feedback/emailjs_feedback_service.dart';
 import 'package:infinity_notes/utilities/generics/ui/dialogs.dart';
 import 'package:infinity_notes/views/login_view.dart';
 import 'package:infinity_notes/views/notes/create_update_note_view.dart';
@@ -22,6 +23,7 @@ Future<void> main() async{
     geminiKey: GeminiAPIKey(),
     // openAIKey: 'OpenAIAPIKey()',
   );
+  EmailJSFeedbackService.init();
   runApp(
     BlocProvider<AuthBloc>(
       create: (context) => AuthBloc(FirebaseAuthProvider()),

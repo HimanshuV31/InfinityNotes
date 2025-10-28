@@ -6,6 +6,9 @@ class ProfileDrawer extends StatelessWidget {
   final VoidCallback onLogout;
   final VoidCallback? onProfile;
   final VoidCallback? onSettings;
+  final VoidCallback? onReportBug;
+  final VoidCallback? onFeedback;
+
 
   const ProfileDrawer({
     super.key,
@@ -14,6 +17,8 @@ class ProfileDrawer extends StatelessWidget {
     required this.onLogout,
     this.onProfile,
     this.onSettings,
+    this.onReportBug,
+    this.onFeedback,
   });
 
   String get _displayName {
@@ -167,7 +172,23 @@ class ProfileDrawer extends StatelessWidget {
                       if (onSettings != null) onSettings!();
                     },
                   ),
-
+                  _buildMenuTile(
+                    icon: Icons.feedback_outlined,
+                    title: 'Send Feedback',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      if (onFeedback != null) onFeedback!();
+                    },
+                  ),
+                  _buildMenuTile(
+                    icon: Icons.bug_report_outlined,
+                    title: 'Report Bug',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      if (onReportBug != null) onReportBug!();
+                    },
+                    isDestructive: true,
+                  ),
                   const Divider(
                     color: Colors.white24,
                     thickness: 1,
@@ -185,7 +206,6 @@ class ProfileDrawer extends StatelessWidget {
                     },
                     isDestructive: true,
                   ),
-
                   const SizedBox(height: 8),
                 ],
               ),
@@ -246,6 +266,8 @@ void showProfileDrawer({
   required VoidCallback onLogout,
   VoidCallback? onProfile,
   VoidCallback? onSettings,
+  VoidCallback? onReportBug,
+  VoidCallback? onFeedback,
 }) {
   showDialog(
     context: context,
@@ -258,6 +280,8 @@ void showProfileDrawer({
         onLogout: onLogout,
         onProfile: onProfile,
         onSettings: onSettings,
+        onReportBug: onReportBug,
+        onFeedback: onFeedback,
       );
     },
   );
