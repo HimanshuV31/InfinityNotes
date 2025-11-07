@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:infinity_notes/services/platform/app_version.dart';
 
 class ProfileDrawer extends StatelessWidget {
   final String userEmail;
@@ -51,7 +52,7 @@ class ProfileDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final drawerWidth = screenWidth * 0.45;
-
+    final String _version = AppVersion.version;
     return Scaffold(
       backgroundColor: Colors.black.withAlpha(102), // Dark overlay
       body: GestureDetector(
@@ -206,7 +207,23 @@ class ProfileDrawer extends StatelessWidget {
                     },
                     isDestructive: true,
                   ),
-                  const SizedBox(height: 8),
+                  // const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Version: $_version",
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[500],
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 2),
                 ],
               ),
             ),

@@ -364,11 +364,18 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
           IconButton(
             onPressed: () async {
               if (_note == null ||
-                  _titleController.text.isEmpty ||
-                  _textController.text.isEmpty) {
+                  (_titleController.text.isEmpty &&
+                      _textController.text.isEmpty) ) {
                 await showCannotShareEmptyNoteDialog(context);
               } else {
-                shareNote(context: context, note: _note!);
+                // bool flag= false;
+                // if (_titleController.text.isEmpty &&
+                //     _textController.text.isNotEmpty) {flag= true;}
+                // else if (_titleController.text.isNotEmpty &&
+                //     _textController.text.isEmpty) {flag= true;}
+                // if(flag) {
+                  shareNote(context: context, note: _note!);
+                // }
               }
             },
             icon: const Icon(Icons.share, color: Colors.white),
@@ -462,7 +469,6 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
               ),
             ),
             const SizedBox(height: 16),
-            // ✅ FIXED: Text field takes remaining space minus links
             Expanded(
               child: TextField(
                 controller: _textController,

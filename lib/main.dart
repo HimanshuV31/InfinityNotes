@@ -8,6 +8,7 @@ import 'package:infinity_notes/services/auth/bloc/auth_event.dart';
 import 'package:infinity_notes/services/auth/bloc/auth_state.dart';
 import 'package:infinity_notes/services/auth/firebase_auth_provider.dart';
 import 'package:infinity_notes/services/feedback/emailjs_feedback_service.dart';
+import 'package:infinity_notes/services/platform/app_version.dart';
 import 'package:infinity_notes/utilities/generics/ui/dialogs.dart';
 import 'package:infinity_notes/views/login_view.dart';
 import 'package:infinity_notes/views/notes/create_update_note_view.dart';
@@ -23,6 +24,7 @@ Future<void> main() async{
     geminiKey: GeminiAPIKey(),
     // openAIKey: 'OpenAIAPIKey()',
   );
+  await AppVersion.init();
   EmailJSFeedbackService.init();
   runApp(
     BlocProvider<AuthBloc>(
@@ -48,7 +50,9 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(1.0), // Force 1.0 scale factor
+            // textScaler: TextScaler.linear(1.0), // Force 1.0 scale factor
+            boldText: false,
+            textScaler: TextScaler.linear(1.0),
           ),
           child: child!,
         );
