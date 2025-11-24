@@ -21,7 +21,7 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  TextEditingController();
 
   bool _isEmailValid = false;
   final bool _isPasswordVisible = false;
@@ -68,12 +68,14 @@ class _RegisterViewState extends State<RegisterView> {
       children: [
         Icon(
           condition ? Icons.check_circle : Icons.cancel,
+          // ✅ Use theme colors for validation icons
           color: condition ? Colors.green : Colors.red,
           size: 18,
         ),
         const SizedBox(width: 6),
         Text(
           text,
+          // ✅ Use theme colors for validation text
           style: TextStyle(color: condition ? Colors.green : Colors.red),
         ),
       ],
@@ -82,12 +84,15 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    const backgroundColor = Colors.amber;
-    const foregroundColor = Colors.white;
+    // ✅ Use theme colors instead of hardcoded
+    final backgroundColor = Theme.of(context).colorScheme.primary;
+    final foregroundColor = Theme.of(context).colorScheme.onPrimary;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state.isLoading) {
-          LoadingScreen().show(context: context, text: state.loadingText ?? "Please wait...");
+          LoadingScreen().show(
+              context: context, text: state.loadingText ?? "Please wait...");
         } else {
           LoadingScreen().hide();
         }
@@ -96,7 +101,7 @@ class _RegisterViewState extends State<RegisterView> {
           if (!state.isLoading && closeDialog != null) {
             closeDialog();
             _closeDialogHandle = null;
-          }   else if (state.isLoading && closeDialog == null) {
+          } else if (state.isLoading && closeDialog == null) {
             _closeDialogHandle = showLoadingDialog(
               context: context,
               text: "Loading... .. .",
@@ -111,8 +116,9 @@ class _RegisterViewState extends State<RegisterView> {
               message: e.message,
             );
           }
-        }
-        else if (state is AuthStateRegistering && state.exception != null && !state.isLoading) {
+        } else if (state is AuthStateRegistering &&
+            state.exception != null &&
+            !state.isLoading) {
           final closeDialog = _closeDialogHandle;
           if (closeDialog != null) {
             closeDialog();
@@ -128,8 +134,9 @@ class _RegisterViewState extends State<RegisterView> {
       child: Scaffold(
         appBar: CustomAppBar(
           title: "Infinity Notes | Register",
-          backgroundColor: Colors.black,
-          foregroundColor: foregroundColor,
+          // ✅ Use theme app bar colors
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor!,
+          foregroundColor: Theme.of(context).appBarTheme.foregroundColor!,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -146,6 +153,7 @@ class _RegisterViewState extends State<RegisterView> {
                     labelText: "Email",
                     suffixIcon: Icon(
                       _isEmailValid ? Icons.check_circle : Icons.cancel,
+                      // ✅ Keep validation colors (green/red are universal)
                       color: _isEmailValid ? Colors.green : Colors.red,
                     ),
                   ),
@@ -170,7 +178,7 @@ class _RegisterViewState extends State<RegisterView> {
                 TextFormField(
                   controller: _passwordController,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(labelText: "Password"),
+                  decoration: const InputDecoration(labelText: "Password"),
                   obscureText: !_isPasswordVisible,
                   onChanged: (value) {
                     _validatePassword(value);
@@ -204,7 +212,7 @@ class _RegisterViewState extends State<RegisterView> {
                       onPressed: () {
                         setState(() {
                           _isConfirmPasswordVisible =
-                              !_isConfirmPasswordVisible;
+                          !_isConfirmPasswordVisible;
                         });
                       },
                     ),

@@ -99,11 +99,9 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    // ✅ FIX 1: Use Dialog instead of AlertDialog for better keyboard handling
     return Dialog(
-      backgroundColor: const Color(0xFF2A2A2A),
+      // ✅ Use theme dialog background
+      backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -111,8 +109,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
         horizontal: 16,
         vertical: 24,
       ),
-
-      // ✅ FIX 2: Wrap entire dialog content in SingleChildScrollView
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -120,22 +116,24 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ✅ HEADER
+              // HEADER
               Row(
                 children: [
                   Icon(
                     widget.type == FeedbackType.bugReport
                         ? Icons.bug_report_outlined
                         : Icons.feedback_outlined,
-                    color: const Color(0xFF3993ad),
+                    // ✅ Use theme primary color
+                    color: Theme.of(context).colorScheme.primary,
                     size: 24,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       _dialogTitle,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        // ✅ Use theme text color
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
@@ -145,7 +143,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
               ),
               const SizedBox(height: 20),
 
-              // ✅ FORM CONTENT
+              // FORM CONTENT
               Form(
                 key: _formKey,
                 child: Column(
@@ -158,25 +156,38 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
+                        // ✅ Use theme surface with opacity
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withAlpha(13),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withAlpha(26),
                         ),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.person_outline,
-                            color: Colors.white54,
+                            // ✅ Use theme secondary color
+                            color:
+                            Theme.of(context).textTheme.bodySmall?.color,
                             size: 16,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               widget.userEmail,
-                              style: const TextStyle(
-                                color: Colors.white70,
+                              style: TextStyle(
+                                // ✅ Use theme secondary text
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.color,
                                 fontSize: 13,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -187,49 +198,67 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                     ),
                     const SizedBox(height: 16),
 
-                    // ✅ FIX 3: Reduced text input size
+                    // Text input
                     TextFormField(
                       controller: _textController,
                       autofocus: true,
-                      maxLines: 5, // ✅ Reduced from 8
-                      minLines: 3, // ✅ Reduced from 6
+                      maxLines: 5,
+                      minLines: 3,
                       keyboardType: TextInputType.multiline,
                       textAlignVertical: TextAlignVertical.top,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        // ✅ Use theme text color
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 14,
                       ),
                       decoration: InputDecoration(
                         hintText: _hintText,
                         hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
+                          // ✅ Use theme hint color
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.color
+                              ?.withAlpha(102),
                           fontSize: 13,
                         ),
                         filled: true,
-                        fillColor: Colors.white.withOpacity(0.05),
+                        // ✅ Use theme surface
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withAlpha(13),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withAlpha(26),
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            color: Colors.white.withOpacity(0.1),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withAlpha(26),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF3993ad),
+                          borderSide: BorderSide(
+                            // ✅ Use theme primary
+                            color: Theme.of(context).colorScheme.primary,
                             width: 2,
                           ),
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Colors.redAccent,
+                          borderSide: BorderSide(
+                            // ✅ Use theme error color
+                            color: Theme.of(context).colorScheme.error,
                           ),
                         ),
                         contentPadding: const EdgeInsets.all(16),
@@ -251,10 +280,10 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withAlpha(26),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: Colors.blue.withOpacity(0.3),
+                            color: Colors.blue.withAlpha(77),
                           ),
                         ),
                         child: Row(
@@ -283,7 +312,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
 
               const SizedBox(height: 24),
 
-              // ✅ ACTION BUTTONS (Always visible at bottom)
+              // ACTION BUTTONS
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -295,7 +324,10 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                     child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: _isSubmitting ? Colors.grey : Colors.white70,
+                        // ✅ Use theme text color
+                        color: _isSubmitting
+                            ? Theme.of(context).disabledColor
+                            : Theme.of(context).textTheme.bodySmall?.color,
                         fontSize: 15,
                       ),
                     ),
@@ -306,9 +338,11 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                   ElevatedButton(
                     onPressed: _isSubmitting ? null : _submitFeedback,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3993ad),
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey.shade700,
+                      // ✅ Use theme primary color
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor:
+                      Theme.of(context).colorScheme.onPrimary,
+                      disabledBackgroundColor: Theme.of(context).disabledColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -318,13 +352,14 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                       ),
                     ),
                     child: _isSubmitting
-                        ? const SizedBox(
+                        ? SizedBox(
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor:
-                        AlwaysStoppedAnimation(Colors.white),
+                        valueColor: AlwaysStoppedAnimation(
+                          Theme.of(context).colorScheme.onPrimary,
+                        ),
                       ),
                     )
                         : const Text(

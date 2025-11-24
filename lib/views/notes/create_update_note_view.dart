@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:infinity_notes/services/auth/auth_service.dart';
 import 'package:infinity_notes/services/cloud/cloud_note.dart';
 import 'package:infinity_notes/services/cloud/firebase_cloud_storage.dart';
-import 'package:infinity_notes/services/notes_actions/delete_note.dart';
 import 'package:infinity_notes/services/notes_actions/share_note.dart';
 import 'package:infinity_notes/utilities/ai/ai_helper.dart';
 import 'package:infinity_notes/utilities/generics/ui/custom_app_bar.dart';
@@ -19,8 +18,10 @@ class CreateUpdateNoteView extends StatefulWidget {
 }
 
 class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
-  final Color backgroundColor = const Color(0xFF62B0D5);
-  final Color foregroundColor = Colors.white;
+  // ✅ Make these late so they update with theme
+  late Color backgroundColor;
+  late Color foregroundColor;
+
   CloudNote? _note;
   late final FirebaseCloudStorage _notesService;
   late final TextEditingController _titleController;
@@ -38,19 +39,23 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     _textController = TextEditingController();
     _setupListeners();
   }
+
   void _setupListeners() {
     _titleController.addListener(_onTitleChanged);
     _textController.addListener(_onTextChanged);
   }
+
   void _onTitleChanged() {
     setState(() {});
     _debouncedHandleChange();
   }
+
   void _onTextChanged() {
     setState(() {});
     _detectLinks();
     _debouncedHandleChange();
   }
+
   void _detectLinks() {
     final text = _textController.text;
     final linkRegex = RegExp(
@@ -76,6 +81,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     });
     debugPrint("🔗 Detected ${_detectedLinks.length} links");
   }
+
   String _extractSiteName(String url) {
     try {
       String cleanUrl = url;
@@ -101,17 +107,20 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       return 'WEBSITE';
     }
   }
+
   void _debouncedHandleChange() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       _handleChange();
     });
   }
+
   List<String>? _getLinksFromDetectedLinks() {
     return _detectedLinks.isNotEmpty
         ? _detectedLinks.map((link) => link.url).toList()
         : null;
   }
+
   Future<void> _handleChange() async {
     final title = _titleController.text.trim();
     final text = _textController.text.trim();
@@ -125,22 +134,26 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       return;
     }
     if (_note != null && title.isEmpty && text.isEmpty) {
-      await deleteNote(
-        context: context,
-        note: _note!,
-        notesService: _notesService,
-      );
+      final confirm = await showDeleteDialog(context: context);
+      if (confirm) {
+        await _notesService.deleteNote(documentId: _note!.documentId);
+        if (!mounted) return;
+        showCustomToast(context, "Note Deleted Successfully");
+        if (!mounted) return;
+        Navigator.of(context).pop();
+      }
       return;
     }
     await _updateNote(title, text);
   }
+
   Future<void> _createNote(String userId, String title, String text) async {
     final links = _getLinksFromDetectedLinks();
     final newNote = await _notesService.createNewNote(
       ownerUserId: userId,
       title: title,
       text: text,
-      links: links, //  Pass detected links
+      links: links,
     );
     setState(() {
       _note = newNote;
@@ -149,13 +162,14 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     });
     debugPrint("📝 Created note with ${links?.length ?? 0} links");
   }
+
   Future<void> _updateNote(String title, String text) async {
     final links = _getLinksFromDetectedLinks();
     await _notesService.updateNote(
       documentId: _note!.documentId,
       title: title,
       text: text,
-      links: links, //  Update links
+      links: links,
     );
     setState(() {
       _initialTitle = title;
@@ -163,6 +177,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     });
     debugPrint("📝 Updated note with ${links?.length ?? 0} links");
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -177,19 +192,20 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         _detectedLinks = _note!.safeLinks
             .map(
               (url) => DetectedLink(
-                url: url,
-                displayText: url,
-                siteName: _extractSiteName(url),
-              ),
-            )
+            url: url,
+            displayText: url,
+            siteName: _extractSiteName(url),
+          ),
+        )
             .toList();
       }
-      _detectLinks(); // Still detect new links in the text
+      _detectLinks();
     } else {
       _initialText = "";
       _initialTitle = "";
     }
   }
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -197,6 +213,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     _debounce?.cancel();
     super.dispose();
   }
+
   void _launchURL(String url) async {
     try {
       final uri = Uri.parse(url);
@@ -206,6 +223,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       debugPrint("🔗 Failed to launch: $e");
     }
   }
+
   void _handleMenuAction(String action) async {
     switch (action) {
       case 'summarize':
@@ -222,6 +240,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         break;
     }
   }
+
   void _handleSummarizeAction() {
     AIHelper.handleSummarizeAction(
       context: context,
@@ -231,8 +250,10 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
           showCustomToast(context, "Summary created successfully!"),
     );
   }
+
   Future<void> _handleDeleteAction() async {
     if (_note != null) {
+      // ✅ NEW: Direct dialog handling
       final confirm = await showDeleteDialog(context: context);
       if (confirm) {
         await _notesService.deleteNote(documentId: _note!.documentId);
@@ -242,11 +263,14 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         Navigator.of(context).pop();
       }
     } else {
+      // Note doesn't exist yet, just clear fields
       _titleController.clear();
       _textController.clear();
       showCustomToast(context, "Content cleared");
     }
   }
+
+
   void _handleExportAction() {
     if (_titleController.text.isEmpty && _textController.text.isEmpty) {
       showCustomToast(context, "Nothing to export");
@@ -315,7 +339,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         ownerUserId: currentUser.id,
         title: newTitle,
         text: text,
-        links: links, //  Include links in copy
+        links: links,
       );
       if (!mounted) return;
       showCustomToast(context, "Note saved as: \"$newTitle\"");
@@ -323,6 +347,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       showCustomToast(context, "Failed to save note copy");
     }
   }
+
   Future<void> _handleDuplicateAction() async {
     final title = _titleController.text.trim();
     final text = _textController.text.trim();
@@ -333,15 +358,14 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     }
     try {
       final currentUser = AuthService.firebase().currentUser!;
-      final duplicatedTitle = title.isNotEmpty
-          ? "$title (Copy)"
-          : "Untitled (Copy)";
+      final duplicatedTitle =
+      title.isNotEmpty ? "$title (Copy)" : "Untitled (Copy)";
       final links = _getLinksFromDetectedLinks();
       await _notesService.createNewNote(
         ownerUserId: currentUser.id,
         title: duplicatedTitle,
         text: text,
-        links: links, //  Include links in duplicate
+        links: links,
       );
       if (!mounted) return;
       showCustomToast(context, "Note duplicated successfully!");
@@ -349,40 +373,39 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       showCustomToast(context, "Failed to duplicate note");
     }
   }
+
   bool get _canSummarize => AIHelper.canSummarizeContent(_textController.text);
+
   @override
   Widget build(BuildContext context) {
+    // ✅ Initialize theme colors here
+    backgroundColor = Theme.of(context).colorScheme.primary;
+    foregroundColor = Theme.of(context).colorScheme.onPrimary;
+
     return Scaffold(
       appBar: CustomAppBar(
         title: _titleController.text.isEmpty
             ? "New Note"
             : _titleController.text,
         themeColor: backgroundColor,
-        backgroundColor: Colors.black,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor!,
         foregroundColor: foregroundColor,
         actions: [
           IconButton(
             onPressed: () async {
               if (_note == null ||
                   (_titleController.text.isEmpty &&
-                      _textController.text.isEmpty) ) {
+                      _textController.text.isEmpty)) {
                 await showCannotShareEmptyNoteDialog(context);
               } else {
-                // bool flag= false;
-                // if (_titleController.text.isEmpty &&
-                //     _textController.text.isNotEmpty) {flag= true;}
-                // else if (_titleController.text.isNotEmpty &&
-                //     _textController.text.isEmpty) {flag= true;}
-                // if(flag) {
-                  shareNote(context: context, note: _note!);
-                // }
+                shareNote(context: context, note: _note!);
               }
             },
-            icon: const Icon(Icons.share, color: Colors.white),
+            icon: Icon(Icons.share, color: foregroundColor),
           ),
           PopupMenuButton<String>(
             onSelected: _handleMenuAction,
-            icon: const Icon(Icons.more_vert, color: Colors.white),
+            icon: Icon(Icons.more_vert, color: foregroundColor),
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: "summarize",
@@ -407,27 +430,33 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
               const PopupMenuDivider(),
               PopupMenuItem(
                 value: "export",
-                enabled:
-                    _titleController.text.isNotEmpty ||
+                enabled: _titleController.text.isNotEmpty ||
                     _textController.text.isNotEmpty,
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.file_download, size: 20, color: Colors.black),
-                    SizedBox(width: 12),
-                    Text("Export"),
+                    Icon(
+                      Icons.file_download,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text("Export"),
                   ],
                 ),
               ),
               PopupMenuItem(
                 value: "duplicate",
-                enabled:
-                    _titleController.text.isNotEmpty ||
+                enabled: _titleController.text.isNotEmpty ||
                     _textController.text.isNotEmpty,
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.copy, size: 20, color: Colors.black),
-                    SizedBox(width: 12),
-                    Text("Duplicate"),
+                    Icon(
+                      Icons.copy,
+                      size: 20,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text("Duplicate"),
                   ],
                 ),
               ),
@@ -454,7 +483,6 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ✅ Title TextField
             TextField(
               controller: _titleController,
               style: const TextStyle(
@@ -480,13 +508,12 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.all(12),
-                  hintText: "Write your note here... Links will appear below!",
+                  hintText: "Write your note here... Links will appear below when detected!",
                 ),
               ),
             ),
             if (_detectedLinks.isNotEmpty) ...[
               const SizedBox(height: 16),
-              // Links header
               Row(
                 children: [
                   const Icon(Icons.link, size: 18, color: Colors.blue),
@@ -508,14 +535,18 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade400),
+                    border: Border.all(
+                      color: Theme.of(context).dividerColor,
+                    ),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: _detectedLinks.length,
-                    separatorBuilder: (context, index) =>
-                        Divider(height: 1, color: Colors.grey.shade300),
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1,
+                      color: Theme.of(context).dividerColor,
+                    ),
                     itemBuilder: (context, index) {
                       final link = _detectedLinks[index];
                       return ListTile(
@@ -556,7 +587,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
                         ),
                         trailing: Icon(
                           Icons.open_in_new,
-                          color: Colors.grey.shade600,
+                          color: Theme.of(context).textTheme.bodySmall?.color,
                           size: 16,
                         ),
                         onTap: () => _launchURL(link.url),
@@ -577,6 +608,7 @@ class DetectedLink {
   final String url;
   final String displayText;
   final String siteName;
+
   DetectedLink({
     required this.url,
     required this.displayText,

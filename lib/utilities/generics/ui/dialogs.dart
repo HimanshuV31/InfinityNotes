@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-
-typedef DialogOptionBuilder<T> = Map<String, DialogOption<T>> Function();
+typedef DialogOptionBuilder<T> = Map<String, DialogOption<T>> Function(
+    BuildContext context);
 
 class DialogOption<T> {
   final T? value;
@@ -12,20 +12,19 @@ class DialogOption<T> {
   DialogOption({this.value, this.style, this.textColor, this.onPressed});
 }
 
-// (PRIVATE) Generic Dialog
+// Generic Dialog
 Future<T?> _showGenericDialog<T>({
   required BuildContext context,
   required String title,
   required String content,
   required DialogOptionBuilder<T> optionBuilder,
   bool? barrierDismissible,
-})
-{
-  final options = optionBuilder();
+}) {
   return showDialog<T>(
     context: context,
     barrierDismissible: barrierDismissible ?? true,
-    builder: (context) {
+    builder: (dialogContext) {
+      final options = optionBuilder(dialogContext);
       return AlertDialog(
         title: Text(title),
         content: Text(content),
@@ -34,38 +33,41 @@ Future<T?> _showGenericDialog<T>({
           final optionDataMessage = entry.value;
           final optionTextColor = entry.value.textColor;
           return ElevatedButton(
-            style: optionDataMessage.style
-                ?? TextButton.styleFrom(backgroundColor: Colors.black),
+            style: optionDataMessage.style ??
+                TextButton.styleFrom(
+                  backgroundColor:
+                  Theme.of(dialogContext).colorScheme.primary,
+                ),
             onPressed: () {
               if (optionDataMessage.onPressed != null) {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
                 optionDataMessage.onPressed!();
               } else {
-                Navigator.of(context).pop(optionDataMessage.value);
+                Navigator.of(dialogContext).pop(optionDataMessage.value);
               }
             },
             child: Text(
               optionTitle,
               style: TextStyle(
-                color: optionTextColor ?? Colors.white,
+                color: optionTextColor ??
+                    Theme.of(dialogContext).colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
-          ); //ElevatedButton
-        }).toList(), //actions
-      ); //return AlertDialog
-    }, //builder
-  ); //return showDialog
+          );
+        }).toList(),
+      );
+    },
+  );
 }
 
-//Delete Dialog
+// Delete Dialog
 Future<bool> showDeleteDialog({required BuildContext context}) {
   return _showGenericDialog<bool>(
     context: context,
     title: 'Delete',
     content: 'Are you sure you want to delete this item?',
-    optionBuilder: () =>
-    {
+    optionBuilder: (ctx) => {
       'Cancel': DialogOption<bool>(
         value: false,
         style: TextButton.styleFrom(
@@ -75,7 +77,7 @@ Future<bool> showDeleteDialog({required BuildContext context}) {
       'Delete': DialogOption<bool>(
         value: true,
         style: TextButton.styleFrom(
-          backgroundColor: Colors.black,
+          backgroundColor: Theme.of(ctx).colorScheme.primary,
         ),
         textColor: Colors.red,
       ),
@@ -83,61 +85,60 @@ Future<bool> showDeleteDialog({required BuildContext context}) {
   ).then((value) => value ?? false);
 }
 
-//Warning Dialog
+// Warning Dialog
 Future<bool?> showWarningDialog({
   required BuildContext context,
   required String title,
   required String message,
   String buttonText = "OK",
-})
-{
+}) {
   return _showGenericDialog<bool>(
-      context: context,
-      title: title,
-      content: message,
-      barrierDismissible: false,
-      optionBuilder: () =>
-      {
-        buttonText: DialogOption<bool>(value:true),
-      }
+    context: context,
+    title: title,
+    content: message,
+    barrierDismissible: false,
+    optionBuilder: (ctx) => {
+      buttonText: DialogOption<bool>(value: true),
+    },
   );
 }
 
-//Logout Dialog
+// Logout Dialog
 Future<bool> showLogoutDialog({required BuildContext context}) {
   return _showGenericDialog<bool>(
     context: context,
     title: "Logout",
     content: "Are you sure you want to logout?",
-    optionBuilder: () =>
-    {
+    optionBuilder: (ctx) => {
       "Cancel": DialogOption<bool>(
         value: false,
         style: TextButton.styleFrom(backgroundColor: Colors.red),
       ),
       "Logout": DialogOption<bool>(
         value: true,
-        style: TextButton.styleFrom(backgroundColor: Colors.black),
+        style: TextButton.styleFrom(
+          backgroundColor: Theme.of(ctx).colorScheme.primary,
+        ),
         textColor: Colors.red,
       ),
     },
   ).then((value) => value ?? false);
 }
 
-//Can't share empty Notes
+// Can't share empty Notes
 Future<void> showCannotShareEmptyNoteDialog(BuildContext context) {
   return _showGenericDialog<void>(
-      context: context,
-      title: "Can't Share Empty Notes",
-      content: 'Error while sharing an empty note. Please select a non-empty note to share.',
-      optionBuilder: () =>
-      {
-        "OK": DialogOption<void>(value: null),
-      }
+    context: context,
+    title: "Can't Share Empty Notes",
+    content:
+    'Error while sharing an empty note. Please select a non-empty note to share.',
+    optionBuilder: (ctx) => {
+      "OK": DialogOption<void>(value: null),
+    },
   );
 }
 
-//Custom Routing Dialog
+// Custom Routing Dialog
 Future<void> showCustomRoutingDialog({
   required BuildContext context,
   required String title,
@@ -148,62 +149,70 @@ Future<void> showCustomRoutingDialog({
   ButtonStyle? cancelButtonStyle,
   ButtonStyle? routeButtonStyle,
   bool? barrierDismissible,
-})
-{
+}) {
   return _showGenericDialog<void>(
     context: context,
     title: title,
     content: content,
     barrierDismissible: barrierDismissible ?? true,
-    optionBuilder: () => {
+    optionBuilder: (ctx) => {
       if (cancelButtonText != null)
         cancelButtonText: DialogOption<void>(
           value: null,
-          style: cancelButtonStyle ?? TextButton.styleFrom(backgroundColor: Colors.red),
-          onPressed: () => Navigator.of(context).pop(),
+          style: cancelButtonStyle ??
+              TextButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: () => Navigator.of(ctx).pop(),
         ),
       routeButtonText: DialogOption<void>(
         value: null,
-        style: routeButtonStyle ?? TextButton.styleFrom(backgroundColor: Colors.black),
+        style: routeButtonStyle ??
+            TextButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.primary,
+            ),
         onPressed: () => Navigator.pushNamed(context, routeToPush),
       ),
     },
   );
 }
 
-//Loading Dialog
+// Loading Dialog
 typedef CloseDialog = void Function();
+
 CloseDialog showLoadingDialog({
   required BuildContext context,
-  required String text,})
-{
-    final dialog= AlertDialog(
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: 10),
-          Text(text),
-        ],
-      ),
-    );
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => dialog,
-    );
-    return () => Navigator.of(context).pop();
+  required String text,
+}) {
+  final dialog = AlertDialog(
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircularProgressIndicator(
+          // ✅ Use theme color
+          valueColor: AlwaysStoppedAnimation(
+            Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(text),
+      ],
+    ),
+  );
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => dialog,
+  );
+  return () => Navigator.of(context).pop();
 }
 
-//Confirm Dialog
+// Confirm Dialog
 Future<bool> showConfirmDialog({required BuildContext context}) {
   return _showGenericDialog<bool>(
     context: context,
     barrierDismissible: false,
     title: 'Send Password Reset Email',
     content: 'Are you sure you want to send a password reset email?',
-    optionBuilder: () =>
-    {
+    optionBuilder: (ctx) => {
       'CANCEL': DialogOption<bool>(
         value: false,
         style: TextButton.styleFrom(
@@ -213,9 +222,9 @@ Future<bool> showConfirmDialog({required BuildContext context}) {
       'CONFIRM': DialogOption<bool>(
         value: true,
         style: TextButton.styleFrom(
-          backgroundColor: Colors.black,
+          backgroundColor: Theme.of(ctx).colorScheme.primary,
         ),
-        textColor: Colors.white,
+        textColor: Theme.of(ctx).colorScheme.onPrimary,
       ),
     },
   ).then((value) => value ?? false);

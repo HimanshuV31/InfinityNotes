@@ -23,13 +23,12 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   Future<void> sendVerificationEmail() async {
     final user = auth.currentUser;
     if (user != null && !user.isEmailVerified) {
-      // await auth.sendEmailVerification();
       context.read<AuthBloc>().add(const AuthEventSendEmailVerification());
       setState(() => _isSent = true);
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Verification email sent!")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Verification email sent!")),
+      );
     }
   }
 
@@ -40,16 +39,17 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
     if (isVerified) {
       context.read<AuthBloc>().add(const AuthEventLogOut());
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Still not verified")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Still not verified")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    const backgroundColor = Colors.teal;
-    const foregroundColor = Colors.white;
+    // ✅ Use theme colors instead of hardcoded
+    final backgroundColor = Theme.of(context).colorScheme.primary;
+    final foregroundColor = Theme.of(context).colorScheme.onPrimary;
 
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
@@ -78,26 +78,32 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
       child: Scaffold(
         appBar: CustomAppBar(
           title: "Infinity Notes | Verify Email",
-          backgroundColor: Colors.black,
-          foregroundColor: foregroundColor,
+          // ✅ Use theme background
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor!,
+          // ✅ Use theme text color
+          foregroundColor: Theme.of(context).appBarTheme.foregroundColor!,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            color: Colors.black,
+            // ✅ Use theme icon color
+            color: Theme.of(context).appBarTheme.foregroundColor,
             onPressed: () =>
                 context.read<AuthBloc>().add(const AuthEventLogOut()),
           ),
         ),
         body: Center(
-          // Centers horizontally & vertically
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              // Shrinks column to content
               crossAxisAlignment: CrossAxisAlignment.center,
-              // Aligns center horizontally
               children: [
-                const Text("Please verify your email."),
+                // ✅ Use theme text color
+                Text(
+                  "Please verify your email.",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _isSent ? null : sendVerificationEmail,
@@ -111,7 +117,8 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 ElevatedButton(
                   onPressed: checkVerified,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueGrey,
+                    // ✅ Use theme secondary color instead of hardcoded Colors.blueGrey
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
                     foregroundColor: foregroundColor,
                   ),
                   child: const Text("I have verified"),

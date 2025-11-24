@@ -16,4 +16,4 @@
 -dontwarn com.google.android.play.core.**
 
 # Your app
--keep class com.infinitynotes.** { *; }
+-keep class com.ehv.infinitynotes.** { *; }

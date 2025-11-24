@@ -12,7 +12,7 @@ class IconToggleSwitch extends StatefulWidget {
   final double toggleSize;
 
   const IconToggleSwitch({
-    Key? key,
+    super.key,
     required this.value,
     required this.onChanged,
     required this.activeIcon,
@@ -22,7 +22,7 @@ class IconToggleSwitch extends StatefulWidget {
     this.width = 70,
     this.height = 40,
     this.toggleSize = 33,
-  }) : super(key: key);
+  });
 
   @override
   State<IconToggleSwitch> createState() => _IconToggleSwitchState();
@@ -71,9 +71,13 @@ class _IconToggleSwitchState extends State<IconToggleSwitch>
         animation: _animationController,
         builder: (context, child) {
           final color = Color.lerp(
-              widget.inactiveColor, widget.activeColor, _animationController.value);
+              widget.inactiveColor,
+              widget.activeColor,
+              _animationController.value);
           final alignment = Alignment.lerp(
-              Alignment(-0.85,0), Alignment(0.85,0), _animationController.value)!;
+              const Alignment(-0.85, 0),
+              const Alignment(0.85, 0),
+              _animationController.value)!;
           final icon = _animationController.value > 0.5
               ? widget.activeIcon
               : widget.inactiveIcon;
@@ -95,11 +99,15 @@ class _IconToggleSwitchState extends State<IconToggleSwitch>
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      boxShadow: const [
+                      boxShadow: [
                         BoxShadow(
-                          color: Colors.black26,
+                          // ✅ Use theme-aware shadow color
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withAlpha(66),
                           blurRadius: 4,
-                          offset: Offset(0, 2),
+                          offset: const Offset(0, 2),
                         )
                       ],
                     ),

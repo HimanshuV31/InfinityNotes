@@ -4,7 +4,6 @@ import 'package:infinity_notes/services/cloud/cloud_note.dart';
 import 'package:infinity_notes/services/platform/platform_utils.dart';
 import 'package:infinity_notes/utilities/generics/ui/linkify_text.dart';
 
-//  CONVERTED: Regular NotesTileView (keep this for other uses)
 class NotesTileView extends StatelessWidget {
   final Iterable<CloudNote> notes;
   final Function(CloudNote) onTapNote;
@@ -33,7 +32,7 @@ class NotesTileView extends StatelessWidget {
       mainAxisSpacing: 8,
       itemCount: notes.length,
       padding: const EdgeInsets.all(10),
-      physics: const AlwaysScrollableScrollPhysics(), //  Enable scrolling
+      physics: const AlwaysScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         final note = notes.elementAt(index);
         return _NoteTile(
@@ -46,7 +45,6 @@ class NotesTileView extends StatelessWidget {
   }
 }
 
-//  NEW: Sliver version for CustomScrollView
 class SliverNotesTileView extends StatelessWidget {
   final Iterable<CloudNote> notes;
   final Function(CloudNote) onTapNote;
@@ -71,7 +69,6 @@ class SliverNotesTileView extends StatelessWidget {
   Widget build(BuildContext context) {
     final notesList = notes.toList();
 
-    //  SLIVER MASONRY GRID: Proper scrolling in CustomScrollView
     return SliverPadding(
       padding: const EdgeInsets.all(8),
       sliver: SliverMasonryGrid.count(
@@ -102,31 +99,28 @@ class _NoteTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const backgroundColor = Color(0xFF3993ad);
-    const foregroundColor = Colors.white60;
+    final backgroundColor = Theme.of(context).colorScheme.primary;
+    final tileBackground = Theme.of(context).cardColor;
     final hasText = note.text.trim().isNotEmpty;
 
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-        padding: const EdgeInsets.all(12), //  ADDED: Internal padding
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: foregroundColor,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: backgroundColor, width: 2),
+          color: tileBackground,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: backgroundColor.withAlpha(128), // 50% opacity
+            width: 0.7,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12,
-              blurRadius: 5,
-              offset: Offset(1, 1),
-              spreadRadius: 1,
-            ),
-            BoxShadow(
-              color: Colors.black.withAlpha(21),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-              spreadRadius: 0,
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(15), // Was 31
+              blurRadius: 2, // Was 5
+              offset: const Offset(0, 1), // Was (1, 1)
+              spreadRadius: 0, // Was 1
             ),
           ],
         ),
@@ -138,10 +132,10 @@ class _NoteTile extends StatelessWidget {
               note.title.isEmpty ? "Untitled" : note.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+              style: TextStyle(
+                fontSize: 23,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             if (hasText) ...[
@@ -150,21 +144,20 @@ class _NoteTile extends StatelessWidget {
                 note.text,
                 maxLines: maxTextLines,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    fontSize: 17,
-                    color: Colors.black,
-                    height: 1.3,
+                style: TextStyle(
+                  fontSize: 17,
+                  color: Theme.of(context).colorScheme.onSurface,
+                  height: 1.3,
                 ),
               ),
             ],
-            //  ADDED: Show timestamp
             if (note.timeAgo.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(
                 note.timeAgo,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).textTheme.bodySmall?.color,
                   fontStyle: FontStyle.italic,
                 ),
               ),

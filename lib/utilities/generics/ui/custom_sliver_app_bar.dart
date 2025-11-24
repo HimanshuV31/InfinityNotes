@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:infinity_notes/services/auth/auth_service.dart';
 import 'package:infinity_notes/utilities/generics/ui/animation/animation_controller.dart';
-import 'package:infinity_notes/utilities/generics/ui/custom_toast.dart';
-import 'package:infinity_notes/utilities/generics/ui/profile_drawer.dart';
 import 'package:infinity_notes/utilities/generics/ui/ui_constants.dart';
+import 'package:infinity_notes/views/menu/menu_view.dart';
 import 'search_bar.dart' as custom;
-
-enum AppBarMode { normal, searching }
 
 class CustomSliverAppBar extends StatefulWidget {
   final String? title;
@@ -41,7 +39,7 @@ class CustomSliverAppBar extends StatefulWidget {
     required this.foregroundColor,
     this.themeColor,
     this.leading,
-    this.pinned = true,
+    this.pinned = false,
     this.floating = false,
     this.expandedHeight,
     this.flexibleSpace,
@@ -64,6 +62,7 @@ class CustomSliverAppBar extends StatefulWidget {
   @override
   State<CustomSliverAppBar> createState() => _CustomSliverAppBarState();
 }
+
 class _CustomSliverAppBarState extends State<CustomSliverAppBar>
     with SingleTickerProviderStateMixin {
   late AnimationController _fadeController;
@@ -79,6 +78,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
     _setupFadeAnimations();
     _checkAndPlayAnimation();
   }
+
   @override
   void dispose() {
     _fadeController.dispose();
@@ -87,11 +87,10 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
 
   void _setupFadeAnimations() {
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800), //  Shorter for cleaner fade
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
-    //  CLEAN: Simple fade out for title
     _titleOpacity = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(
         parent: _fadeController,
@@ -99,7 +98,6 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
       ),
     );
 
-    //  CLEAN: Simple fade in for search
     _searchOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _fadeController,
@@ -109,7 +107,6 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
   }
 
   void _checkAndPlayAnimation() {
-    //  SIMPLE: Check the global flag
     if (GlobalAnimationController.shouldShowTitleAnimation() && mounted) {
       debugPrint("🎯 ✅ Starting title animation...");
 
@@ -118,10 +115,9 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
         _isAnimating = true;
       });
 
-      //  CONSUME: Mark animation as played to prevent repeat
       GlobalAnimationController.consumeTitleAnimation();
 
-      Future.delayed(Duration(milliseconds: 1500), () {
+      Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           _fadeController.forward().then((_) {
             if (mounted) {
@@ -143,19 +139,18 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      pinned: widget.pinned,
-      floating: widget.floating,
+      pinned: false,
+      floating: true,
+      snap: true,
       expandedHeight: widget.expandedHeight,
       backgroundColor: Colors.transparent,
       foregroundColor: widget.foregroundColor,
       elevation: widget.elevation,
       leading: widget.leading,
       titleSpacing: 8,
-
       title: SizedBox(
         height: kToolbarHeight - 4,
         child: _isAnimating
@@ -164,13 +159,10 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
           builder: (context, child) {
             return Stack(
               children: [
-                //  CLEAN: Search fades in (no sliding)
                 Opacity(
                   opacity: _searchOpacity.value,
                   child: _buildSearchMode(),
                 ),
-
-                //  CLEAN: Title fades out (no sliding)
                 Opacity(
                   opacity: _titleOpacity.value,
                   child: _buildNormalMode(),
@@ -183,21 +175,22 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
             ? _buildNormalMode()
             : _buildSearchMode(),
       ),
-
       actions: widget.actions ?? [_buildProfileMenu()],
       flexibleSpace: null,
     );
   }
 
-  //  CLEAN: No SlideTransition wrappers, just containers
   Widget _buildNormalMode() {
     return Container(
       height: kToolbarHeight - 4,
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(255),
+        color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withAlpha(102), width: 1.2),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withAlpha(102),
+          width: 1.2,
+        ),
         boxShadow: UIConstants.containerShadow,
       ),
       alignment: Alignment.center,
@@ -206,7 +199,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onPrimary,
           letterSpacing: 0.5,
           shadows: UIConstants.textShadow,
         ),
@@ -229,57 +222,66 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
   }
 
   Widget _buildProfileMenu() {
+    final user = AuthService.firebase().currentUser;
+    final displayName = user?.displayName;
+    final photoURL = user?.photoURL;
+
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: GestureDetector(
         onTap: () {
-          showProfileDrawer(
-            context: context,
-            userEmail: widget.userEmail,
-            onLogout: () {
-              if (widget.onLogout != null) {
-                widget.onLogout!();
-              } else {
-                debugPrint('🚪 No logout handler provided');
-              }
-            },
-            onProfile: () {
-              showCustomToast(context, "👤 Profile feature coming soon...");
-              debugPrint('👤 Profile feature coming soon!');
-            },
-            onSettings: () {
-              showCustomToast(context,'⚙️ Settings feature coming soon!');
-              debugPrint('⚙️ Settings feature coming soon!');
-            },
-            onReportBug: widget.onReportBug,
-            onFeedback: widget.onFeedback
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => MenuView(
+                userEmail: widget.userEmail,
+                displayName: displayName,
+                photoURL: photoURL,
+                onLogout: widget.onLogout,
+                onProfile: widget.onProfile,
+                onSettings: widget.onSettings,
+                onReportBug: widget.onReportBug,
+                onFeedback: widget.onFeedback,
+              ),
+            ),
           );
         },
         child: Container(
           padding: const EdgeInsets.all(3),
           decoration: BoxDecoration(
-            color: Colors.black.withAlpha(255),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white.withAlpha(200), width: 1.5),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.inversePrimary.withAlpha(200),
+              width: 1.5,
+            ),
             boxShadow: UIConstants.strongShadow,
           ),
           child: CircleAvatar(
             radius: 16,
-            backgroundColor: Colors.cyan.withAlpha(40),
-            child: Text(
-              widget.userEmail.isNotEmpty
-                  ? widget.userEmail[0].toUpperCase()
-                  : "U",
+            backgroundColor: const Color(0xFF3993ad),
+            backgroundImage: photoURL != null && photoURL.isNotEmpty
+                ? NetworkImage(photoURL)
+                : null,
+            child: photoURL == null || photoURL.isEmpty
+                ? Text(
+              _getInitial(displayName, widget.userEmail),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w900,
-                color: Colors.white, //  Full opacity white
+                color: Theme.of(context).colorScheme.onPrimary,
                 shadows: UIConstants.textShadow,
               ),
-            ),
+            )
+                : null,
           ),
         ),
       ),
     );
+  }
+
+  String _getInitial(String? displayName, String email) {
+    if (displayName != null && displayName.isNotEmpty) {
+      return displayName[0].toUpperCase();
+    }
+    return email.isNotEmpty ? email[0].toUpperCase() : "U";
   }
 }

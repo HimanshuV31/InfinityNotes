@@ -12,6 +12,7 @@ class SearchBar extends StatefulWidget {
   final VoidCallback? onToggleView;
   final bool isListView;
   final VoidCallback? onClose;
+
   const SearchBar({
     super.key,
     required this.isExpanded,
@@ -28,6 +29,13 @@ class SearchBar extends StatefulWidget {
 class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
   final _controller = TextEditingController();
   Timer? _debounceTimer;
+
+  // ✅ NEW: Focus node to control keyboard
+  final _focusNode = FocusNode();
+
+  // ✅ NEW: Track if searching
+  bool _isSearching = false;
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +43,10 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
   }
 
   void _onTextChanged() {
+    setState(() {
+      _isSearching = _controller.text.isNotEmpty;
+    });
+
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
       context.read<SearchBloc>().add(SearchQueryChanged(_controller.text));
@@ -44,34 +56,48 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
     }
   }
 
+  // ✅ NEW: Cancel search function
+  void _cancelSearch() {
+    _controller.clear();
+    _focusNode.unfocus(); // Close keyboard
+    context.read<SearchBloc>().add(const SearchCleared());
+    setState(() {
+      _isSearching = false;
+    });
+  }
+
   @override
   void dispose() {
     _controller.removeListener(_onTextChanged);
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
-  // In search_bar.dart, simplify the build method:
   @override
   Widget build(BuildContext context) {
     if (!widget.isExpanded) {
       return const SizedBox.shrink();
     }
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(102),
+        color: Theme.of(context).colorScheme.primary.withAlpha(102),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withAlpha(153), width: 1.5),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withAlpha(153),
+          width: 1.5,
+        ),
         boxShadow: UIConstants.containerShadow,
       ),
       child: Row(
         children: [
           // Search Icon
           Padding(
-            padding: EdgeInsets.only(left: 16, right: 12),
+            padding: const EdgeInsets.only(left: 16, right: 12),
             child: Icon(
               Icons.search,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
               size: 22,
               shadows: UIConstants.iconShadow,
             ),
@@ -81,10 +107,11 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
           Expanded(
             child: TextField(
               controller: _controller,
+              focusNode: _focusNode, // ✅ NEW
               autofocus: false,
               textAlignVertical: TextAlignVertical.center,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 height: 1.0,
@@ -93,7 +120,7 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
               decoration: InputDecoration(
                 hintText: "Search Notes",
                 hintStyle: TextStyle(
-                  color: Colors.white70,
+                  color: Theme.of(context).colorScheme.onPrimary.withAlpha(179),
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   height: 1.0,
@@ -101,7 +128,7 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
                 ),
                 border: InputBorder.none,
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(vertical: 0),
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
                 alignLabelWithHint: true,
               ),
               onChanged: (text) => _onTextChanged(),
@@ -113,52 +140,53 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
     );
   }
 
-
-  //Build overlayed action icons
   Widget _buildActionIcons() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        //Clear Search (only when text exists)
-        if (_controller.text.isNotEmpty)
-          IconButton(
-            icon: const Icon(
-              Icons.clear,
+        // ✅ NEW: Animated Cancel/Toggle Switch
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (child, animation) {
+            return ScaleTransition(
+              scale: animation,
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            );
+          },
+          child: _isSearching
+          // Show CANCEL button when searching
+              ? IconButton(
+            key: const ValueKey('cancel_button'),
+            icon: Icon(
+              Icons.close,
               size: 20,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
               shadows: UIConstants.iconShadow,
             ),
-            onPressed: () {
-              _controller.clear();
-              context.read<SearchBloc>().add(const SearchCleared());
-            },
+            onPressed: _cancelSearch,
             padding: const EdgeInsets.all(8),
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-          ),
-
-        // View Toggle (List/Grid)
-        if (widget.onToggleView != null)
-          IconButton(
+          )
+          // Show TOGGLE VIEW button when not searching
+              : (widget.onToggleView != null
+              ? IconButton(
+            key: const ValueKey('toggle_button'),
             icon: Icon(
               widget.isListView ? Icons.grid_view : Icons.view_agenda,
               size: 20,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
               shadows: UIConstants.iconShadow,
             ),
             onPressed: widget.onToggleView,
             padding: const EdgeInsets.all(8),
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-          ),
-
-        //Close Search
-        if (widget.onClose != null)
-          IconButton(
-            icon: const Icon(Icons.close, size: 20, color: Colors.white70),
-            onPressed: widget.onClose,
-            padding: const EdgeInsets.all(8),
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-          ),
-        const SizedBox(width: 8), // Right Padding
+          )
+              : const SizedBox.shrink(key: ValueKey('empty'))),
+        ),
+        const SizedBox(width: 8),
       ],
     );
   }

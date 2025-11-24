@@ -16,18 +16,16 @@ abstract class AuthState {
 class AuthStateLoggedIn extends AuthState {
   const AuthStateLoggedIn({
     required this.user,
-    required bool isLoading,
-  }): super(isLoading: isLoading);
+    required super.isLoading,
+  });
   final AuthUser user;
 }
 
 class AuthStateNeedsEmailVerification extends AuthState {
-  const AuthStateNeedsEmailVerification({required bool isLoading})
-      : super(isLoading: isLoading);
+  const AuthStateNeedsEmailVerification({required super.isLoading,});
 }
 class AuthStateNavigateToVerifyEmail extends AuthState{
-  const AuthStateNavigateToVerifyEmail({ bool isLoading = false})
-      : super(isLoading: isLoading);
+  const AuthStateNavigateToVerifyEmail({ super.isLoading = false});
 }
 
 class AuthStateLoggedOut extends AuthState with EquatableMixin {
@@ -35,21 +33,16 @@ class AuthStateLoggedOut extends AuthState with EquatableMixin {
 
   const AuthStateLoggedOut({
     required this.exception,
-    required bool isLoading,
-    String? loadingText,
-  })
-      : super(
-    isLoading: isLoading,
-    loadingText: loadingText,
-  );
+    required super.isLoading,
+    super.loadingText = null,
+  });
   @override
   List<Object?> get props => [exception, isLoading];
 }
 
 class AuthStateUninitialized extends AuthState {
 
-  const AuthStateUninitialized({required bool isLoading})
-      : super(isLoading: isLoading);
+  const AuthStateUninitialized({required super.isLoading});
 }
 
 class AuthStateRegistering extends AuthState {
@@ -57,8 +50,8 @@ class AuthStateRegistering extends AuthState {
 
   const AuthStateRegistering({
     required this.exception,
-    required bool isLoading,
-  }): super(isLoading: isLoading);
+    required super.isLoading,
+  });
 }
 
 class AuthStateForgotPassword extends AuthState {
@@ -66,7 +59,7 @@ class AuthStateForgotPassword extends AuthState {
   final bool hasSentEmail;
   const AuthStateForgotPassword({
     required this.exception,
-    required bool isLoading,
+    required super.isLoading,
     required this.hasSentEmail,
-  }): super(isLoading: isLoading);
+  });
 }

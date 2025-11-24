@@ -8,6 +8,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color foregroundColor;
   final Color? themeColor;
   final IconButton? leading;
+
   const CustomAppBar({
     super.key,
     required this.title,
@@ -16,47 +17,54 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.foregroundColor,
     required this.backgroundColor,
     this.actions,
-    this.leading=null,
+    this.leading,
   });
 
   @override
   Widget build(BuildContext context) {
-    final double fontSize = 23;
-    final double strokeWidth = 2;
-    final double letterSpacing =1.5;
+    const double fontSize = 23;
+    const double strokeWidth = 2;
+    const double letterSpacing = 1.5;
+
     return AppBar(
-      title:  titleWidget ?? (title != null ? Stack(
-        children: [
-          Text(
-            title!,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              letterSpacing: letterSpacing,
-              foreground: Paint()
-                ..style = PaintingStyle.stroke
-                ..strokeWidth = strokeWidth
-                ..color = backgroundColor,
-            ),
-          ),
-          Text(
-            title!,
-            style: TextStyle(
-              fontSize: 23,
-              fontWeight: FontWeight.bold,
-              color: foregroundColor,
-              letterSpacing: letterSpacing,
-            ),
-          ),
-        ],
-      ) : null),
-      backgroundColor: themeColor ?? backgroundColor ,
+      title: titleWidget ??
+          (title != null
+              ? Stack(
+            children: [
+              Text(
+                title!,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: letterSpacing,
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = strokeWidth
+                  // ✅ Use theme-aware background
+                    ..color = backgroundColor,
+                ),
+              ),
+              Text(
+                title!,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: FontWeight.bold,
+                  // ✅ Use theme-aware foreground
+                  color: foregroundColor,
+                  letterSpacing: letterSpacing,
+                ),
+              ),
+            ],
+          )
+              : null),
+      // ✅ Already theme-aware (passed as parameter)
+      backgroundColor: themeColor ?? backgroundColor,
       foregroundColor: foregroundColor,
       elevation: 0,
       leading: leading,
       actions: actions,
       flexibleSpace: themeColor != null
-          ?null
+          ? null
           : LayoutBuilder(
         builder: (context, constraints) {
           bool isDesktop = constraints.maxWidth > 600;
@@ -80,4 +88,3 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
-

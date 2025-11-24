@@ -20,7 +20,8 @@ Future<String?> showNoteActionsDialog({
     builder: (context) {
       return Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: Colors.white,
+        // ✅ Use theme dialog background
+        backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -31,15 +32,22 @@ Future<String?> showNoteActionsDialog({
                 child: Center(
                   child: Text(
                     note.title.isNotEmpty ? note.title : 'Select Action',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      // ✅ Use theme text color
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
               ),
-              const Divider(height: 20, thickness: 1),
+              Divider(
+                height: 20,
+                thickness: 1,
+                // ✅ Use theme divider color
+                color: Theme.of(context).dividerColor,
+              ),
 
               InkWell(
                 onTap: () => Navigator.pop(context, 'ai_summary'),
@@ -51,7 +59,8 @@ Future<String?> showNoteActionsDialog({
                         Icons.auto_awesome,
                         color: AIHelper.canSummarizeContent(note.text)
                             ? Colors.blue
-                            : Colors.grey,
+                        // ✅ Use theme disabled color
+                            : Theme.of(context).disabledColor,
                       ),
                       const SizedBox(width: 16),
                       Text(
@@ -59,8 +68,10 @@ Future<String?> showNoteActionsDialog({
                         style: TextStyle(
                           fontSize: 16,
                           color: AIHelper.canSummarizeContent(note.text)
-                              ? null
-                              : Colors.grey,
+                          // ✅ Use theme text color when enabled
+                              ? Theme.of(context).colorScheme.onSurface
+                          // ✅ Use theme disabled color
+                              : Theme.of(context).disabledColor,
                         ),
                       ),
                     ],
@@ -68,37 +79,60 @@ Future<String?> showNoteActionsDialog({
                 ),
               ),
 
-              const Divider(height: 20, thickness: 1),
+              Divider(
+                height: 20,
+                thickness: 1,
+                // ✅ Use theme divider color
+                color: Theme.of(context).dividerColor,
+              ),
               InkWell(
                 onTap: () => Navigator.pop(context, 'share'),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
-                    children: const [
-                      Icon(Icons.share, color: Colors.green),
-                      SizedBox(width: 16),
-                      Text('Share', style: TextStyle(fontSize: 16)),
+                    children: [
+                      const Icon(Icons.share, color: Colors.green),
+                      const SizedBox(width: 16),
+                      Text(
+                        'Share',
+                        style: TextStyle(
+                          fontSize: 16,
+                          // ✅ Use theme text color
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
-              const Divider(),
+              Divider(
+                // ✅ Use theme divider color
+                color: Theme.of(context).dividerColor,
+              ),
               InkWell(
                 onTap: () => Navigator.pop(context, 'delete'),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
-                    children: const [
-                      Icon(Icons.delete_forever, color: Colors.red),
-                      SizedBox(width: 16),
-                      Text('Delete', style: TextStyle(fontSize: 16)),
+                    children: [
+                      const Icon(Icons.delete_forever, color: Colors.red),
+                      const SizedBox(width: 16),
+                      Text(
+                        'Delete',
+                        style: TextStyle(
+                          fontSize: 16,
+                          // ✅ Use theme text color
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
-              const Divider(),
-              // Add more options with same pattern here if needed
-
+              Divider(
+                // ✅ Use theme divider color
+                color: Theme.of(context).dividerColor,
+              ),
             ],
           ),
         ),
@@ -118,8 +152,7 @@ Future<void> handleLongPressNote({
     note: note,
   );
 
-  if (action == null) return; // user dismissed dialog
-
+  if (action == null) return;
   switch (action) {
     case 'ai_summary':
       if (AIHelper.canSummarizeContent(note.text)) {
@@ -132,7 +165,8 @@ Future<void> handleLongPressNote({
           },
         );
       } else {
-        showCustomToast(context, "Note content is empty or too short to summarize");
+        showCustomToast(
+            context, "Note content is empty or too short to summarize");
       }
       break;
     case 'share':
@@ -156,8 +190,5 @@ Future<void> handleLongPressNote({
         }
       }
       break;
-  // case 'archive':
-    //   // Future feature handling
-    //   break;
-  } /*Switch case*/
+  }
 }

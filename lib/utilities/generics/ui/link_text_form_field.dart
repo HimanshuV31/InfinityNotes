@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LinkTextFormField extends StatefulWidget {
@@ -63,7 +62,7 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        //  ALWAYS VISIBLE TextField with proper decoration
+        // ALWAYS VISIBLE TextField with proper decoration
         TextField(
           controller: widget.controller,
           focusNode: _focusNode,
@@ -73,17 +72,24 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
           textAlignVertical: widget.textAlignVertical,
           style: TextStyle(
             fontSize: 15.0,
-            color: _hasFocus ? Colors.black : Colors.transparent, // Hide text when not focused
+            // ✅ Hide text when not focused, show theme color when focused
+            color: _hasFocus
+                ? Theme.of(context).colorScheme.onSurface
+                : Colors.transparent,
           ),
-          decoration: widget.decoration ?? InputDecoration(
-            border: const OutlineInputBorder(),
-            contentPadding: const EdgeInsets.all(12),
-            hintText: widget.hintText,
-            hintStyle: const TextStyle(color: Colors.grey), // Make hint always visible
-          ),
+          decoration: widget.decoration ??
+              InputDecoration(
+                border: const OutlineInputBorder(),
+                contentPadding: const EdgeInsets.all(12),
+                hintText: widget.hintText,
+                // ✅ Use theme secondary text for hint
+                hintStyle: TextStyle(
+                  color: Theme.of(context).textTheme.bodySmall?.color,
+                ),
+              ),
         ),
 
-        //  OVERLAY: RichText with colored links (only when not focused)
+        // OVERLAY: RichText with colored links (only when not focused)
         if (!_hasFocus)
           Positioned.fill(
             child: GestureDetector(
@@ -96,9 +102,13 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
                   child: widget.controller.text.isEmpty
                       ? Text(
                     widget.hintText ?? "Write your note here...",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15.0,
-                      color: Colors.grey,
+                      // ✅ Use theme hint color
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.color,
                     ),
                   )
                       : RichText(
@@ -130,7 +140,11 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
       if (match.start > currentIndex) {
         spans.add(TextSpan(
           text: text.substring(currentIndex, match.start),
-          style: const TextStyle(fontSize: 15.0, color: Colors.black),
+          // ✅ Fixed: Removed const, use theme color
+          style: TextStyle(
+            fontSize: 15.0,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
         ));
       }
 
@@ -144,8 +158,7 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
           decoration: TextDecoration.underline,
           decorationColor: Colors.blue.shade700,
         ),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () => _launchURL(linkText),
+        recognizer: TapGestureRecognizer()..onTap = () => _launchURL(linkText),
       ));
 
       currentIndex = match.end;
@@ -155,7 +168,11 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
     if (currentIndex < text.length) {
       spans.add(TextSpan(
         text: text.substring(currentIndex),
-        style: const TextStyle(fontSize: 15.0, color: Colors.black),
+        // ✅ Fixed: Removed const, use theme color
+        style: TextStyle(
+          fontSize: 15.0,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ));
     }
 

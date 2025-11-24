@@ -90,7 +90,6 @@ class SliverNotesListView extends StatelessWidget {
     final notesList = notes.toList();
 
     if (columns == 1) {
-      //SLIVER LIST: Proper scrolling in CustomScrollView
       return SliverPadding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         sliver: SliverList(
@@ -99,14 +98,14 @@ class SliverNotesListView extends StatelessWidget {
               final note = notesList[index];
               return Padding(
                 padding: EdgeInsets.only(
-                  top: index == 0 ? 10 : 4, //  Tight vertical spacing
+                  top: index == 0 ? 10 : 4,
                   bottom: index == notesList.length - 1 ? 10 : 4,
                 ),
-              child: NoteListTile(
-                note: note,
-                onTap: () => onTapNote(note),
-                onLongPress: () => onLongPressNote(note),
-              ),
+                child: NoteListTile(
+                  note: note,
+                  onTap: () => onTapNote(note),
+                  onLongPress: () => onLongPressNote(note),
+                ),
               );
             },
             childCount: notesList.length,
@@ -114,7 +113,6 @@ class SliverNotesListView extends StatelessWidget {
         ),
       );
     } else {
-      //  SLIVER GRID: Proper scrolling in CustomScrollView
       return SliverPadding(
         padding: const EdgeInsets.all(10),
         sliver: SliverGrid(
@@ -155,19 +153,22 @@ class NoteListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const backgroundColor = Color(0xFF3993ad);
-    const foregroundColor = Colors.white60;
+    final backgroundColor = Theme.of(context).colorScheme.primary;
+    final cardBackground = Theme.of(context).cardColor;
 
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
       child: Card(
-        color: foregroundColor,
+        color: cardBackground,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
-          side: const BorderSide(color: backgroundColor, width: 2),
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: backgroundColor.withAlpha(128),
+            width: 0.7,
+          ),
         ),
-        elevation: 3,
+        elevation: 1,
         margin: const EdgeInsets.all(0),
         clipBehavior: Clip.none,
         child: Padding(
@@ -179,23 +180,29 @@ class NoteListTile extends StatelessWidget {
                 note.title.isEmpty ? "Untitled" : note.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 23,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               const SizedBox(height: 8),
               LinkifyText(
                 note.text,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 17, color: Colors.black),
+                style: TextStyle(
+                  fontSize: 17,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
-              // Show timestamp
               if (note.timeAgo.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Text(
                   note.timeAgo,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[600],
+                    color: Theme.of(context).textTheme.bodySmall?.color,
                     fontStyle: FontStyle.italic,
                   ),
                 ),

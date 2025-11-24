@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'; //  Import foundation.dart
 import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:infinity_notes/utilities/generics/ui/custom_toast.dart';
-import 'package:path/path.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LinkifyText extends StatelessWidget {
@@ -33,9 +30,10 @@ class LinkifyText extends StatelessWidget {
       maxLines: maxLines,
       overflow: overflow ?? TextOverflow.ellipsis,
       linkStyle: TextStyle(
-        color: linkColor ?? Colors.lightBlueAccent,
+        // ✅ Use theme link color (kept blue for link clarity)
+        color: linkColor ?? Colors.blue.shade700,
         decoration: TextDecoration.underline,
-        decorationColor: linkColor ?? Colors.lightBlueAccent,
+        decorationColor: linkColor ?? Colors.blue.shade700,
         fontWeight: FontWeight.w500,
       ),
       options: const LinkifyOptions(
@@ -47,36 +45,30 @@ class LinkifyText extends StatelessWidget {
     );
   }
 
-}
-Future<void> _launchURL(String url) async {
-  try {
-    String processedUrl = url.trim();
+  Future<void> _launchURL(String url) async {
+    try {
+      String processedUrl = url.trim();
 
-    // Simple protocol addition
-    if (!processedUrl.startsWith('http://') && !processedUrl.startsWith('https://')) {
-      processedUrl = 'https://$processedUrl';
+      // Simple protocol addition
+      if (!processedUrl.startsWith('http://') &&
+          !processedUrl.startsWith('https://')) {
+        processedUrl = 'https://$processedUrl';
+      }
+
+      final uri = Uri.parse(processedUrl);
+      debugPrint("🔗 Attempting to launch: $uri");
+
+      // Simple launch - let the system handle the rest
+      final launched =
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+      if (launched) {
+        debugPrint("🔗 ✅ URL launched successfully");
+      } else {
+        debugPrint("🔗 ❌ Failed to launch URL");
+      }
+    } catch (e) {
+      debugPrint("🔗 ❌ Error launching URL: $e");
     }
-
-    final uri = Uri.parse(processedUrl);
-    debugPrint("🔗 Attempting to launch: $uri");
-
-    // Simple launch - let the system handle the rest
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-
-    if (launched) {
-      debugPrint("🔗 ✅ URL launched successfully");
-    } else {
-      debugPrint("🔗 ❌ Failed to launch URL");
-    }
-  } catch (e) {
-    debugPrint("🔗 ❌ Error launching URL: $e");
   }
 }
-
-
-void _showLaunchError(String message) {
-    showCustomToast(context as BuildContext, message);
-    debugPrint("🔗 Error: $message");
-  }
-
-

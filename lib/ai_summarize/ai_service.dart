@@ -193,7 +193,7 @@ class AIService {
         } else if (response.statusCode == 429) {
           throw AIServiceException('Rate limit exceeded. Wait a moment and try again.');
         } else {
-          throw AIServiceException('API Error ${response.statusCode}: ${errorBody}');
+          throw AIServiceException('API Error ${response.statusCode}: $errorBody');
         }
       }
     } catch (e) {

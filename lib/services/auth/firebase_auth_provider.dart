@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuthException, FirebaseAuth, OAuthProvider, GoogleAuthProvider;
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
-
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:infinity_notes/services/auth/auth_exception.dart';
 import 'package:infinity_notes/services/auth/auth_provider.dart';
@@ -23,8 +21,7 @@ class FirebaseAuthProvider implements AuthProvider {
   Future<AuthUser> createUser({
     required String email,
     required String password,
-  }) async
-  {
+  }) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
@@ -39,7 +36,7 @@ class FirebaseAuthProvider implements AuthProvider {
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromCode(e.code);
     } catch (e) {
-      throw GenericAuthException("$e.code");
+      throw GenericAuthException("$e");
     }
   }
 
@@ -56,22 +53,40 @@ class FirebaseAuthProvider implements AuthProvider {
   Future<AuthUser> logIn({
     required String email,
     required String password,
-  }) async
-  {
+  }) async {
     try {
-      final userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-      final user = userCredential.user;
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Reload user to get latest profile data
+      await FirebaseAuth.instance.currentUser?.reload();
+      final user = currentUser;
+
       if (user != null) {
-        return AuthUser.fromFirebase(user);
+        return user;
       } else {
         throw const UserNotFoundAuthException();
       }
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromCode(e.code);
     } catch (e) {
-      throw GenericAuthException("$e.code");
+      throw GenericAuthException("$e");
     }
+  }
+
+  @override
+  Future<AuthUser?> reloadUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.reload();
+      final refreshedUser = FirebaseAuth.instance.currentUser;
+      if (refreshedUser != null) {
+        return AuthUser.fromFirebase(refreshedUser);
+      }
+    }
+    return null;
   }
 
   @override
@@ -86,7 +101,7 @@ class FirebaseAuthProvider implements AuthProvider {
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromCode(e.code);
     } catch (e) {
-      throw GenericAuthException("$e.code");
+      throw GenericAuthException("$e");
     }
   }
 
@@ -102,7 +117,7 @@ class FirebaseAuthProvider implements AuthProvider {
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromCode(e.code);
     } catch (e) {
-      throw GenericAuthException("$e.code");
+      throw GenericAuthException("$e");
     }
   }
 
@@ -111,72 +126,70 @@ class FirebaseAuthProvider implements AuthProvider {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      throw AuthException.fromCode("$e.code");
+      throw AuthException.fromCode(e.code);
     } catch (e) {
-      throw GenericAuthException("$e.code");
+      throw GenericAuthException("$e");
     }
   }
 
   @override
   Future<AuthUser?> logInWithGoogle() async {
-    if (PlatformUtils.isWeb) {
-      final userCred = await FirebaseAuth.instance.signInWithPopup(
-        GoogleAuthProvider(),
-      );
-      return AuthUser.fromFirebase(userCred.user!);
+    try {
+      if (PlatformUtils.isWeb) {
+        final userCred = await FirebaseAuth.instance.signInWithPopup(
+          GoogleAuthProvider(),
+        );
+        return userCred.user != null
+            ? AuthUser.fromFirebase(userCred.user!)
+            : null;
+      }
+
+      final gsi = GoogleSignIn.instance;
+      await gsi.initialize();
+
+      final account = await gsi.authenticate();
+      // if (account == null) return null;
+
+      final idToken = (account.authentication).idToken;
+      if (idToken == null) {
+        throw GenericAuthException('missing-id-token');
+      }
+
+      final oauth = GoogleAuthProvider.credential(idToken: idToken);
+      final userCred = await FirebaseAuth.instance.signInWithCredential(oauth);
+
+      return userCred.user != null
+          ? AuthUser.fromFirebase(userCred.user!)
+          : null;
+    } on FirebaseAuthException catch (e) {
+      throw AuthException.fromCode(e.code);
+    } catch (e) {
+      throw GenericAuthException("$e");
     }
-
-    final gsi = GoogleSignIn.instance;
-    await gsi.initialize();
-
-    final account = await gsi.authenticate();
-    if (account == null) return null;
-
-    final idToken = (account.authentication).idToken;
-    if (idToken == null) {
-      throw GenericAuthException('missing-id-token');
-    }
-
-    final oauth = GoogleAuthProvider.credential(idToken: idToken);
-    final userCred = await FirebaseAuth.instance.signInWithCredential(oauth);
-    return AuthUser.fromFirebase(userCred.user!);
   }
 
   @override
   Future<AuthUser?> logInWithApple() async {
-    final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-    );
-    final oauthCredential = OAuthProvider("apple.com").credential(
-      idToken: appleCredential.identityToken,
-      accessToken: appleCredential.authorizationCode,
-    );
-    final userCredential = await FirebaseAuth.instance.signInWithCredential(
-      oauthCredential,
-    );
-    return AuthUser.fromFirebase(userCredential.user!);
-  }
-
-  @override
-  Future<AuthUser?> reloadUser() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw const UserNotFoundAuthException();
-      }
-      debugPrint("FirebaseAuthProvider (reloadUser): Reloading User.");
-      await user.reload(); // refresh user from Firebase
-      debugPrint("FirebaseAuthProvider (reloadUser): Reload successful. Now FreshUser");
-      final freshUser = FirebaseAuth.instance.currentUser;
-      if(freshUser == null){
-        debugPrint("FirebaseAuthProvider (reloadUser): FreshUser is null.");
-        throw const UserNotFoundAuthException();
-      }
-      debugPrint("FirebaseAuthProvider (reloadUser): Returning freshUser.");
-      return AuthUser.fromFirebase(freshUser);
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final oauthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        oauthCredential,
+      );
+
+      return userCredential.user != null
+          ? AuthUser.fromFirebase(userCredential.user!)
+          : null;
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromCode(e.code);
     } catch (e) {
