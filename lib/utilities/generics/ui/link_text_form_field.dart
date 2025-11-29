@@ -72,7 +72,7 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
           textAlignVertical: widget.textAlignVertical,
           style: TextStyle(
             fontSize: 15.0,
-            // ✅ Hide text when not focused, show theme color when focused
+            // Hide text when not focused, show theme color when focused
             color: _hasFocus
                 ? Theme.of(context).colorScheme.onSurface
                 : Colors.transparent,
@@ -82,7 +82,6 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
                 border: const OutlineInputBorder(),
                 contentPadding: const EdgeInsets.all(12),
                 hintText: widget.hintText,
-                // ✅ Use theme secondary text for hint
                 hintStyle: TextStyle(
                   color: Theme.of(context).textTheme.bodySmall?.color,
                 ),
@@ -104,7 +103,6 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
                     widget.hintText ?? "Write your note here...",
                     style: TextStyle(
                       fontSize: 15.0,
-                      // ✅ Use theme hint color
                       color: Theme.of(context)
                           .textTheme
                           .bodySmall
@@ -140,7 +138,6 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
       if (match.start > currentIndex) {
         spans.add(TextSpan(
           text: text.substring(currentIndex, match.start),
-          // ✅ Fixed: Removed const, use theme color
           style: TextStyle(
             fontSize: 15.0,
             color: Theme.of(context).colorScheme.onSurface,
@@ -168,7 +165,6 @@ class _LinkTextFormFieldState extends State<LinkTextFormField> {
     if (currentIndex < text.length) {
       spans.add(TextSpan(
         text: text.substring(currentIndex),
-        // ✅ Fixed: Removed const, use theme color
         style: TextStyle(
           fontSize: 15.0,
           color: Theme.of(context).colorScheme.onSurface,

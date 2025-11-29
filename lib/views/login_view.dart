@@ -37,14 +37,12 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Use theme colors
     final backgroundColor = Theme.of(context).colorScheme.primary;
     final foregroundColor = Theme.of(context).colorScheme.onPrimary;
 
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if (state is AuthStateLoggedOut && state.exception != null) {
-          // Display error dialogs for login failure
           final e = state.exception;
           if (e is AuthException) {
             showWarningDialog(
@@ -157,7 +155,6 @@ class _LoginViewState extends State<LoginView> {
                 "Or sign in with a social account",
                 style: TextStyle(
                   fontSize: 16,
-                  // ✅ Use theme secondary text color
                   color: Theme.of(context).textTheme.bodySmall?.color,
                 ),
               ),
@@ -178,7 +175,6 @@ class _LoginViewState extends State<LoginView> {
                         const SizedBox(height: 4),
                         Text(
                           "Google",
-                          // ✅ Use theme text color
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
@@ -201,7 +197,6 @@ class _LoginViewState extends State<LoginView> {
                           const SizedBox(height: 4),
                           Text(
                             "Apple",
-                            // ✅ Use theme text color
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),

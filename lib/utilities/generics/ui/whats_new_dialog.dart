@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:infinity_notes/services/platform/version_tracker.dart';
 import 'package:infinity_notes/services/platform/app_version.dart';
 
-// ========================================
-// 1. DIALOG LOGIC - Handles showing/dismissing
-// ========================================
+// DIALOG LOGIC - Handles showing/dismissing
 
 /// Show "What's New" dialog if version changed
 Future<void> showWhatsNewIfNeeded(BuildContext context) async {
@@ -24,9 +22,7 @@ Future<void> showWhatsNewIfNeeded(BuildContext context) async {
   }
 }
 
-// ========================================
-// 2. DIALOG WIDGET - Wrapper with styling
-// ========================================
+// DIALOG WIDGET - Wrapper with styling
 
 class WhatsNewDialog extends StatelessWidget {
   const WhatsNewDialog({super.key});
@@ -37,14 +33,12 @@ class WhatsNewDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const WhatsNewContent(), // ✅ Delegates content rendering
+      child: const WhatsNewContent(),
     );
   }
 }
 
-// ========================================
-// 3. CONTENT LOGIC - What's displayed inside
-// ========================================
+// CONTENT LOGIC - What's displayed inside
 
 class WhatsNewContent extends StatelessWidget {
   const WhatsNewContent({super.key});
@@ -69,9 +63,7 @@ class WhatsNewContent extends StatelessWidget {
     );
   }
 
-  // ========================================
   // CONTENT SECTIONS
-  // ========================================
 
   Widget _buildHeader(BuildContext context) {
     return Row(
@@ -214,9 +206,7 @@ class WhatsNewContent extends StatelessWidget {
   }
 }
 
-// ========================================
-// 4. DATA MODEL - Feature information
-// ========================================
+// DATA MODEL - Feature information
 
 class _FeatureData {
   final IconData icon;

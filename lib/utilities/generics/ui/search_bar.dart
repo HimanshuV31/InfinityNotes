@@ -30,10 +30,8 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
   final _controller = TextEditingController();
   Timer? _debounceTimer;
 
-  // ✅ NEW: Focus node to control keyboard
   final _focusNode = FocusNode();
 
-  // ✅ NEW: Track if searching
   bool _isSearching = false;
 
   @override
@@ -56,7 +54,6 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
     }
   }
 
-  // ✅ NEW: Cancel search function
   void _cancelSearch() {
     _controller.clear();
     _focusNode.unfocus(); // Close keyboard
@@ -107,7 +104,7 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
           Expanded(
             child: TextField(
               controller: _controller,
-              focusNode: _focusNode, // ✅ NEW
+              focusNode: _focusNode,
               autofocus: false,
               textAlignVertical: TextAlignVertical.center,
               style: TextStyle(
@@ -144,7 +141,6 @@ class _SearchBarState extends State<SearchBar> with TickerProviderStateMixin {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // ✅ NEW: Animated Cancel/Toggle Switch
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           transitionBuilder: (child, animation) {

@@ -21,7 +21,7 @@ class AIService {
   String? _geminiKey;
 
   // Conservative limits for reliability
-  static const int _maxContentLength = 8000;     // Conservative for testing
+  static const int _maxContentLength = 10000;     // Conservative for testing
   static const int _maxOutputTokens = 1000;      // Conservative output
 
   // Initialize API keys
@@ -35,7 +35,7 @@ class AIService {
         await _secureStorage.write(key: 'gemini_key', value: geminiKey);
         _geminiKey = geminiKey;
       }
-      debugPrint("✅ AI Service keys initialized successfully");
+      debugPrint("AI Service keys initialized successfully");
     } catch (e) {
       debugPrint("❌ Error initializing keys: $e");
       // Fallback to memory storage
@@ -149,7 +149,7 @@ class AIService {
       debugPrint("📡 Response Status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
-        debugPrint("✅ Success! Processing response...");
+        debugPrint("Success! Processing response...");
 
         final data = jsonDecode(response.body);
 
@@ -251,7 +251,7 @@ class AIService {
         String summary = json['summary']?.toString().trim() ?? '';
 
         if (title.isNotEmpty && summary.isNotEmpty) {
-          debugPrint("✅ JSON parsing successful");
+          debugPrint("JSON parsing successful");
           return {
             'title': title.length > 100 ? '${title.substring(0, 97)}...' : title,
             'summary': summary
@@ -296,9 +296,9 @@ class AIService {
       await _secureStorage.deleteAll();
       _openAIKey = null;
       _geminiKey = null;
-      debugPrint("✅ Keys cleared");
+      debugPrint("Keys cleared");
     } catch (e) {
-      debugPrint("❌ Error clearing keys: $e");
+      debugPrint("Error clearing keys: $e");
     }
   }
 

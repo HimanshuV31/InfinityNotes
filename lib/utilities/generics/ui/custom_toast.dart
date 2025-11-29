@@ -12,7 +12,6 @@ void showCustomToast(BuildContext context, String message) {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            // ✅ Already using theme!
             color: Theme.of(context).colorScheme.onSurface.withAlpha(204),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -20,8 +19,6 @@ void showCustomToast(BuildContext context, String message) {
             child: Text(
               message,
               style: TextStyle(
-                // ✅ Use theme inverse color for better contrast
-                color: Theme.of(context).colorScheme.surface,
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,

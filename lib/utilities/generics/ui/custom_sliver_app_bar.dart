@@ -108,7 +108,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
 
   void _checkAndPlayAnimation() {
     if (GlobalAnimationController.shouldShowTitleAnimation() && mounted) {
-      debugPrint("🎯 ✅ Starting title animation...");
+      debugPrint("Starting title animation...");
 
       setState(() {
         _showTitle = true;
@@ -125,7 +125,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
                 _showTitle = false;
                 _isAnimating = false;
               });
-              debugPrint("🎯 ✅ Animation complete!");
+              debugPrint("Animation complete!");
             }
           });
         }

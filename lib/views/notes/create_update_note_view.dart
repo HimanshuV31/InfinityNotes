@@ -18,7 +18,6 @@ class CreateUpdateNoteView extends StatefulWidget {
 }
 
 class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
-  // ✅ Make these late so they update with theme
   late Color backgroundColor;
   late Color foregroundColor;
 
@@ -253,7 +252,6 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
 
   Future<void> _handleDeleteAction() async {
     if (_note != null) {
-      // ✅ NEW: Direct dialog handling
       final confirm = await showDeleteDialog(context: context);
       if (confirm) {
         await _notesService.deleteNote(documentId: _note!.documentId);
@@ -378,7 +376,6 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Initialize theme colors here
     backgroundColor = Theme.of(context).colorScheme.primary;
     foregroundColor = Theme.of(context).colorScheme.onPrimary;
 

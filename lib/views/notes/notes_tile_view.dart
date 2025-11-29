@@ -112,15 +112,15 @@ class _NoteTile extends StatelessWidget {
           color: tileBackground,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: backgroundColor.withAlpha(128), // 50% opacity
+            color: backgroundColor.withAlpha(128),
             width: 0.7,
           ),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.onSurface.withAlpha(15), // Was 31
-              blurRadius: 2, // Was 5
-              offset: const Offset(0, 1), // Was (1, 1)
-              spreadRadius: 0, // Was 1
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(15),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+              spreadRadius: 0,
             ),
           ],
         ),

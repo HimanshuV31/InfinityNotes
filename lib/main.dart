@@ -208,7 +208,7 @@ ThemeData _buildDarkTheme() {
     ),
 
     dialogTheme: const DialogThemeData(
-      backgroundColor: Color(0xFF2E2E2E), // Lighter grey than background
+      backgroundColor: Color(0xFF2E2E2E),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(20)),
       ),

@@ -148,8 +148,6 @@ class FirebaseAuthProvider implements AuthProvider {
       await gsi.initialize();
 
       final account = await gsi.authenticate();
-      // if (account == null) return null;
-
       final idToken = (account.authentication).idToken;
       if (idToken == null) {
         throw GenericAuthException('missing-id-token');

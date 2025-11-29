@@ -187,7 +187,6 @@ CloseDialog showLoadingDialog({
       mainAxisSize: MainAxisSize.min,
       children: [
         CircularProgressIndicator(
-          // ✅ Use theme color
           valueColor: AlwaysStoppedAnimation(
             Theme.of(context).colorScheme.primary,
           ),

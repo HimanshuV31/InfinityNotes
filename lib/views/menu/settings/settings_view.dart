@@ -44,7 +44,7 @@ class SettingsView extends StatelessWidget {
             icon: Icons.info_outline,
             title: 'Version',
             subtitle: AppVersion.version,
-            trailing: const SizedBox.shrink(), // No arrow for version
+            trailing: const SizedBox.shrink(),
           ),
         ],
       ),
@@ -74,7 +74,7 @@ class SettingsView extends StatelessWidget {
           subtitle: Text(_getThemeLabel(themeNotifier.themeMode)),
           trailing: DropdownButton<ThemeMode>(
             value: themeNotifier.themeMode,
-            underline: const SizedBox(), // Remove underline
+            underline: const SizedBox(),
             items: const [
               DropdownMenuItem(
                 value: ThemeMode.light,

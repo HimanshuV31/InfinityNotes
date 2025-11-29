@@ -40,7 +40,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   foreground: Paint()
                     ..style = PaintingStyle.stroke
                     ..strokeWidth = strokeWidth
-                  // ✅ Use theme-aware background
                     ..color = backgroundColor,
                 ),
               ),
@@ -49,7 +48,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 style: TextStyle(
                   fontSize: fontSize,
                   fontWeight: FontWeight.bold,
-                  // ✅ Use theme-aware foreground
                   color: foregroundColor,
                   letterSpacing: letterSpacing,
                 ),
@@ -57,7 +55,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ],
           )
               : null),
-      // ✅ Already theme-aware (passed as parameter)
       backgroundColor: themeColor ?? backgroundColor,
       foregroundColor: foregroundColor,
       elevation: 0,

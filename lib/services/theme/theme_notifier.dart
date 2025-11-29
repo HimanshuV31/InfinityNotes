@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ThemeNotifier extends ChangeNotifier {
   static const String _keyThemeMode = 'theme_mode';
 
-  ThemeMode _themeMode = ThemeMode.system; // ✅ CHANGED THIS LINE
+  ThemeMode _themeMode = ThemeMode.system;
 
   ThemeMode get themeMode => _themeMode;
 
@@ -20,7 +20,7 @@ class ThemeNotifier extends ChangeNotifier {
     if (savedTheme != null) {
       _themeMode = ThemeMode.values.firstWhere(
             (mode) => mode.toString() == savedTheme,
-        orElse: () => ThemeMode.system, // ✅ Also update fallback
+        orElse: () => ThemeMode.system,
       );
       notifyListeners();
     }

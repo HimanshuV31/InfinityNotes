@@ -30,7 +30,6 @@ class LinkifyText extends StatelessWidget {
       maxLines: maxLines,
       overflow: overflow ?? TextOverflow.ellipsis,
       linkStyle: TextStyle(
-        // ✅ Use theme link color (kept blue for link clarity)
         color: linkColor ?? Colors.blue.shade700,
         decoration: TextDecoration.underline,
         decorationColor: linkColor ?? Colors.blue.shade700,
@@ -63,12 +62,12 @@ class LinkifyText extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
 
       if (launched) {
-        debugPrint("🔗 ✅ URL launched successfully");
+        debugPrint("URL launched successfully");
       } else {
-        debugPrint("🔗 ❌ Failed to launch URL");
+        debugPrint("Failed to launch URL");
       }
     } catch (e) {
-      debugPrint("🔗 ❌ Error launching URL: $e");
+      debugPrint("Error launching URL: $e");
     }
   }
 }

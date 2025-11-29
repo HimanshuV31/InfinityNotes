@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show ReadContext, BlocListener, BlocProvider, BlocBuilder;
@@ -41,7 +40,6 @@ class _NotesViewState extends State<NotesView> {
   CloseDialog? _closeDialogHandle;
   late SearchBloc _searchBloc;
 
-  // ✅ NEW: ValueNotifier to manage view state separately
   final ValueNotifier<bool> _showListViewNotifier = ValueNotifier<bool>(false);
 
   Future<void> newNote() async {
@@ -65,7 +63,6 @@ class _NotesViewState extends State<NotesView> {
     });
   }
 
-  // ✅ NEW: Toggle without setState
   void _toggleView() {
     _showListViewNotifier.value = !_showListViewNotifier.value;
   }
@@ -141,14 +138,12 @@ class _NotesViewState extends State<NotesView> {
                   }
                 });
 
-                // ✅ WRAP CustomScrollView with ValueListenableBuilder
                 return ValueListenableBuilder<bool>(
                   valueListenable: _showListViewNotifier,
                   builder: (context, showListView, _) {
                     return CustomScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
-                        // ✅ AppBar only rebuilds when notes change, NOT when view toggles
                         CustomSliverAppBar(
                           title: "Infinity Notes",
                           userEmail: userEmail,
@@ -191,13 +186,11 @@ class _NotesViewState extends State<NotesView> {
             ),
             child: FloatingActionButton(
               onPressed: newNote,
-              // ✅ Hardcoded teal background
               backgroundColor: const Color(0xFF3993ad),
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
                 side: BorderSide(
-                  // ✅ Theme-aware border (white in light, black in dark)
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.black
                       : Colors.white,
@@ -206,7 +199,6 @@ class _NotesViewState extends State<NotesView> {
               ),
               child: Icon(
                 Icons.add,
-                // ✅ Theme-aware icon (white in light, black in dark)
                 color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.black
                     : Colors.white,
@@ -272,7 +264,6 @@ class _NotesViewState extends State<NotesView> {
 
     Iterable<CloudNote> notesToShow;
 
-    // ✅ FIX: Use if-else with 'is' checks instead of switch on runtimeType
     if (searchState is SearchResults) {
       debugPrint("🔍 ENTERING SearchResults branch");
 

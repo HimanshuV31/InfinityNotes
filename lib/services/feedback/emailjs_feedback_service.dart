@@ -19,7 +19,7 @@ class EmailJSFeedbackService {
 
   /// Initialize EmailJS - not needed for HTTP approach
   static void init() {
-    debugPrint('✅ EmailJS service initialized (HTTP mode)');
+    debugPrint('EmailJS service initialized (HTTP mode)');
   }
 
   static Future<bool> sendFeedback({
@@ -38,7 +38,7 @@ class EmailJSFeedbackService {
       final appInfo = await _getAppInfo();
       final timestamp = DateTime.now().toIso8601String();
 
-      // ✅ Define colors based on feedback type
+      // Define colors based on feedback type
       final bool isBugReport = type == EmailJSFeedbackType.bugReport;
       final String headerColor = isBugReport ? '#dc3545' : '#3993ad';        // Red for bugs, Blue for feedback
       final String headerColorDark = isBugReport ? '#c82333' : '#2980b9';   // Darker shade for gradient
@@ -79,10 +79,10 @@ class EmailJSFeedbackService {
       debugPrint('📬 EmailJS Response: ${response.statusCode} - ${response.body}');
 
       if (response.statusCode == 200) {
-        debugPrint('✅ Feedback email sent successfully!');
+        debugPrint('Feedback email sent successfully!');
         return true;
       } else {
-        debugPrint('❌ EmailJS Error: ${response.statusCode} - ${response.body}');
+        debugPrint('EmailJS Error: ${response.statusCode} - ${response.body}');
         return false;
       }
 

@@ -20,7 +20,6 @@ Future<String?> showNoteActionsDialog({
     builder: (context) {
       return Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        // ✅ Use theme dialog background
         backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -35,7 +34,6 @@ Future<String?> showNoteActionsDialog({
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      // ✅ Use theme text color
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                     textAlign: TextAlign.center,
@@ -45,7 +43,6 @@ Future<String?> showNoteActionsDialog({
               Divider(
                 height: 20,
                 thickness: 1,
-                // ✅ Use theme divider color
                 color: Theme.of(context).dividerColor,
               ),
 
@@ -59,7 +56,6 @@ Future<String?> showNoteActionsDialog({
                         Icons.auto_awesome,
                         color: AIHelper.canSummarizeContent(note.text)
                             ? Colors.blue
-                        // ✅ Use theme disabled color
                             : Theme.of(context).disabledColor,
                       ),
                       const SizedBox(width: 16),
@@ -68,9 +64,7 @@ Future<String?> showNoteActionsDialog({
                         style: TextStyle(
                           fontSize: 16,
                           color: AIHelper.canSummarizeContent(note.text)
-                          // ✅ Use theme text color when enabled
                               ? Theme.of(context).colorScheme.onSurface
-                          // ✅ Use theme disabled color
                               : Theme.of(context).disabledColor,
                         ),
                       ),
@@ -82,7 +76,6 @@ Future<String?> showNoteActionsDialog({
               Divider(
                 height: 20,
                 thickness: 1,
-                // ✅ Use theme divider color
                 color: Theme.of(context).dividerColor,
               ),
               InkWell(
@@ -97,7 +90,6 @@ Future<String?> showNoteActionsDialog({
                         'Share',
                         style: TextStyle(
                           fontSize: 16,
-                          // ✅ Use theme text color
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
@@ -106,7 +98,6 @@ Future<String?> showNoteActionsDialog({
                 ),
               ),
               Divider(
-                // ✅ Use theme divider color
                 color: Theme.of(context).dividerColor,
               ),
               InkWell(
@@ -121,7 +112,6 @@ Future<String?> showNoteActionsDialog({
                         'Delete',
                         style: TextStyle(
                           fontSize: 16,
-                          // ✅ Use theme text color
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
@@ -130,7 +120,6 @@ Future<String?> showNoteActionsDialog({
                 ),
               ),
               Divider(
-                // ✅ Use theme divider color
                 color: Theme.of(context).dividerColor,
               ),
             ],

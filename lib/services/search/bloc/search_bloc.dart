@@ -24,27 +24,27 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   {
     _allNotes = event.allNotes;
     emit(SearchInitial(notes: _allNotes));
-    debugPrint("🔍 SearchBloc initialized with ${_allNotes.length} notes");
+    debugPrint("SearchBloc initialized with ${_allNotes.length} notes");
   }
 
   //  No Timer, synchronous search
   void _onSearchQueryChanged(SearchQueryChanged event, Emitter<SearchState> emit) {
     final query = event.query.trim();
-    debugPrint("🔍 SearchBloc: Processing query '$query'");
+    debugPrint("SearchBloc: Processing query '$query'");
 
     if (query.isEmpty) {
       emit(SearchInitial(notes: _allNotes));
-      debugPrint("🔍 SearchBloc: Emitting SearchInitial with ${_allNotes.length} notes");
+      debugPrint("SearchBloc: Emitting SearchInitial with ${_allNotes.length} notes");
     } else {
       final results = SearchService.filterNotes(_allNotes, query);
-      debugPrint("🔍 SearchBloc: Found ${results.length} results for '$query'");
+      debugPrint("SearchBloc: Found ${results.length} results for '$query'");
 
       if (results.isEmpty) {
         emit(SearchEmpty(query: query));
-        debugPrint("🔍 SearchBloc: Emitting SearchEmpty");
+        debugPrint("SearchBloc: Emitting SearchEmpty");
       } else {
         emit(SearchResults(results: results, query: query));
-        debugPrint("🔍 SearchBloc: Emitting SearchResults with ${results.length} notes");
+        debugPrint("SearchBloc: Emitting SearchResults with ${results.length} notes");
       }
     }
   }

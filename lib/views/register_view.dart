@@ -68,14 +68,12 @@ class _RegisterViewState extends State<RegisterView> {
       children: [
         Icon(
           condition ? Icons.check_circle : Icons.cancel,
-          // ✅ Use theme colors for validation icons
           color: condition ? Colors.green : Colors.red,
           size: 18,
         ),
         const SizedBox(width: 6),
         Text(
           text,
-          // ✅ Use theme colors for validation text
           style: TextStyle(color: condition ? Colors.green : Colors.red),
         ),
       ],
@@ -84,7 +82,6 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Use theme colors instead of hardcoded
     final backgroundColor = Theme.of(context).colorScheme.primary;
     final foregroundColor = Theme.of(context).colorScheme.onPrimary;
 
@@ -107,7 +104,6 @@ class _RegisterViewState extends State<RegisterView> {
               text: "Loading... .. .",
             );
           }
-          // Display error dialogs for login failure
           final e = state.exception;
           if (e is AuthException) {
             await showWarningDialog(
@@ -134,7 +130,6 @@ class _RegisterViewState extends State<RegisterView> {
       child: Scaffold(
         appBar: CustomAppBar(
           title: "Infinity Notes | Register",
-          // ✅ Use theme app bar colors
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor!,
           foregroundColor: Theme.of(context).appBarTheme.foregroundColor!,
         ),
@@ -153,7 +148,6 @@ class _RegisterViewState extends State<RegisterView> {
                     labelText: "Email",
                     suffixIcon: Icon(
                       _isEmailValid ? Icons.check_circle : Icons.cancel,
-                      // ✅ Keep validation colors (green/red are universal)
                       color: _isEmailValid ? Colors.green : Colors.red,
                     ),
                   ),

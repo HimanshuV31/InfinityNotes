@@ -101,7 +101,6 @@ class _IconToggleSwitchState extends State<IconToggleSwitch>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          // ✅ Use theme-aware shadow color
                           color: Theme.of(context)
                               .colorScheme
                               .onSurface

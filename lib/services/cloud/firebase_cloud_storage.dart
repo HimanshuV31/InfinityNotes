@@ -12,10 +12,8 @@ class FirebaseCloudStorage {
   FirebaseCloudStorage._sharedInstance();
 
   factory FirebaseCloudStorage() => _shared;
-
-  // ============================
+   
   // CORE CRUD OPERATIONS
-  // ============================
 
   /// Creates a new note with automatic timestamps
   Future<CloudNote> createNewNote({
@@ -94,9 +92,7 @@ class FirebaseCloudStorage {
     }
   }
 
-  // ============================
   // PRIMARY QUERY METHODS
-  // ============================
 
   /// Get all notes for a user, sorted newest first (client-side sorting)
   Stream<Iterable<CloudNote>> allNotes({
@@ -165,9 +161,7 @@ class FirebaseCloudStorage {
     });
   }
 
-  // ============================
   // LINK MANAGEMENT METHODS
-  // ============================
 
   /// Update only the links for a note
   Future<void> updateNoteLinks({
@@ -271,9 +265,7 @@ class FirebaseCloudStorage {
     });
   }
 
-  // ============================
   // ADVANCED QUERY METHODS (Optional)
-  // ============================
 
   /// Get notes with pagination support
   Stream<List<CloudNote>> getPaginatedNotes({
@@ -337,9 +329,7 @@ class FirebaseCloudStorage {
     }
   }
 
-  // ============================
   // UTILITY METHODS
-  // ============================
 
   ///  HELPER: Create CloudNote from QueryDocumentSnapshot with proper type casting
   CloudNote _createCloudNoteFromDoc(QueryDocumentSnapshot doc) {

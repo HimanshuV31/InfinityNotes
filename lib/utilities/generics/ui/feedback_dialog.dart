@@ -7,7 +7,7 @@ enum FeedbackType {
   generalFeedback,
 }
 
-/// Reusable dialog for collecting user feedback or bug reports
+// Reusable dialog for collecting user feedback or bug reports
 class FeedbackDialog extends StatefulWidget {
   final FeedbackType type;
   final String userEmail;
@@ -100,7 +100,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      // ✅ Use theme dialog background
       backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -123,7 +122,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                     widget.type == FeedbackType.bugReport
                         ? Icons.bug_report_outlined
                         : Icons.feedback_outlined,
-                    // ✅ Use theme primary color
                     color: Theme.of(context).colorScheme.primary,
                     size: 24,
                   ),
@@ -132,7 +130,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                     child: Text(
                       _dialogTitle,
                       style: TextStyle(
-                        // ✅ Use theme text color
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -156,7 +153,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        // ✅ Use theme surface with opacity
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
@@ -173,7 +169,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                         children: [
                           Icon(
                             Icons.person_outline,
-                            // ✅ Use theme secondary color
                             color:
                             Theme.of(context).textTheme.bodySmall?.color,
                             size: 16,
@@ -183,7 +178,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                             child: Text(
                               widget.userEmail,
                               style: TextStyle(
-                                // ✅ Use theme secondary text
                                 color: Theme.of(context)
                                     .textTheme
                                     .bodySmall
@@ -207,14 +201,12 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                       keyboardType: TextInputType.multiline,
                       textAlignVertical: TextAlignVertical.top,
                       style: TextStyle(
-                        // ✅ Use theme text color
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 14,
                       ),
                       decoration: InputDecoration(
                         hintText: _hintText,
                         hintStyle: TextStyle(
-                          // ✅ Use theme hint color
                           color: Theme.of(context)
                               .textTheme
                               .bodySmall
@@ -223,7 +215,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                           fontSize: 13,
                         ),
                         filled: true,
-                        // ✅ Use theme surface
                         fillColor: Theme.of(context)
                             .colorScheme
                             .onSurface
@@ -249,7 +240,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            // ✅ Use theme primary
                             color: Theme.of(context).colorScheme.primary,
                             width: 2,
                           ),
@@ -257,7 +247,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            // ✅ Use theme error color
                             color: Theme.of(context).colorScheme.error,
                           ),
                         ),
@@ -324,7 +313,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                     child: Text(
                       'Cancel',
                       style: TextStyle(
-                        // ✅ Use theme text color
                         color: _isSubmitting
                             ? Theme.of(context).disabledColor
                             : Theme.of(context).textTheme.bodySmall?.color,
@@ -338,7 +326,6 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
                   ElevatedButton(
                     onPressed: _isSubmitting ? null : _submitFeedback,
                     style: ElevatedButton.styleFrom(
-                      // ✅ Use theme primary color
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor:
                       Theme.of(context).colorScheme.onPrimary,

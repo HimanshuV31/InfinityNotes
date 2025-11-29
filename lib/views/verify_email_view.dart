@@ -47,7 +47,6 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Use theme colors instead of hardcoded
     final backgroundColor = Theme.of(context).colorScheme.primary;
     final foregroundColor = Theme.of(context).colorScheme.onPrimary;
 
@@ -64,7 +63,6 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               text: "Loading... .. .",
             );
           }
-          // Display error dialogs for login failure
           final e = state.exception;
           if (e is AuthException) {
             showWarningDialog(
@@ -78,13 +76,10 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
       child: Scaffold(
         appBar: CustomAppBar(
           title: "Infinity Notes | Verify Email",
-          // ✅ Use theme background
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor!,
-          // ✅ Use theme text color
           foregroundColor: Theme.of(context).appBarTheme.foregroundColor!,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            // ✅ Use theme icon color
             color: Theme.of(context).appBarTheme.foregroundColor,
             onPressed: () =>
                 context.read<AuthBloc>().add(const AuthEventLogOut()),
@@ -97,7 +92,6 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // ✅ Use theme text color
                 Text(
                   "Please verify your email.",
                   style: TextStyle(
@@ -117,7 +111,6 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 ElevatedButton(
                   onPressed: checkVerified,
                   style: ElevatedButton.styleFrom(
-                    // ✅ Use theme secondary color instead of hardcoded Colors.blueGrey
                     backgroundColor: Theme.of(context).colorScheme.secondary,
                     foregroundColor: foregroundColor,
                   ),
