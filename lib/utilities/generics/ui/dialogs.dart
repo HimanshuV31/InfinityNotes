@@ -144,7 +144,7 @@ Future<void> showCustomRoutingDialog({
   required String title,
   required String content,
   required String routeButtonText,
-  required String routeToPush,
+  required VoidCallback onRoutePressed,
   String? cancelButtonText,
   ButtonStyle? cancelButtonStyle,
   ButtonStyle? routeButtonStyle,
@@ -169,7 +169,10 @@ Future<void> showCustomRoutingDialog({
             TextButton.styleFrom(
               backgroundColor: Theme.of(ctx).colorScheme.primary,
             ),
-        onPressed: () => Navigator.pushNamed(context, routeToPush),
+        onPressed: () => {
+          Navigator.of(ctx).pop(),
+          onRoutePressed(),
+        },
       ),
     },
   );

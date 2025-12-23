@@ -1,0 +1,11 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.ehv.infinitynotes",
+    "sha256_cert_fingerprints": [
+      "9C7468C2A839AA21272EF38B92CBD74B7DE4689174F02DDEF5B3854AD73436AB",
+      "26357A6AE0B00D936B959588FA1894F5FDEF17CF2D2B0D87E58C86D4FA3B54D1"
+    ]
+  }
+}]

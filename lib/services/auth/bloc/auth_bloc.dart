@@ -8,22 +8,37 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(AuthProvider provider) : super(const AuthStateUninitialized(isLoading: true)) {
     //Initialize
     on<AuthEventInitialize>((event, emit) async {
-      await provider.initialize();
-      try{
-        debugPrint("AuthBloc: Reloading user");
-        await provider.reloadUser();
-      }catch(_){
-        debugPrint("AuthBloc: Error reloading user");
-      }
-      final user = provider.currentUser;
-      if (user == null) {
+      try {
+        debugPrint('🔥 AuthBloc: Starting initialization...');
+
+        await provider.initialize();
+
+        try {
+          debugPrint('🔥 AuthBloc: Reloading user...');
+          await provider.reloadUser();
+        } catch (e) {
+          debugPrint('⚠️ AuthBloc: Error reloading user - $e');
+        }
+
+        final user = provider.currentUser;
+
+        if (user == null) {
+          debugPrint('✅ AuthBloc: No user found → LoggedOut');
+          emit(const AuthStateLoggedOut(exception: null, isLoading: false));
+        } else if (!user.isEmailVerified) {
+          debugPrint('✅ AuthBloc: User not verified → NeedsVerification');
+          emit(const AuthStateNeedsEmailVerification(isLoading: false));
+        } else {
+          debugPrint('✅ AuthBloc: User logged in → ${user.email}');
+          emit(AuthStateLoggedIn(user: user, isLoading: false));
+        }
+      } catch (e) {
+        // ✅ CRITICAL: If initialization fails, emit LoggedOut instead of staying stuck
+        debugPrint('❌ AuthBloc: Init failed - $e');
         emit(const AuthStateLoggedOut(exception: null, isLoading: false));
-      } else if (!user.isEmailVerified) {
-        emit(const AuthStateNeedsEmailVerification(isLoading: false));
-      } else {
-        emit(AuthStateLoggedIn(user:user, isLoading: false));
       }
     });
+
     //Login
     on<AuthEventLogIn>((event, emit) async {
       emit(const AuthStateLoggedOut(

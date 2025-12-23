@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Opening Infinity Notes...</title>
+    <style>
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          text-align: center;
+          padding: 60px 20px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+        }
+        h1 { font-size: 2.5em; margin-bottom: 20px; }
+        p { font-size: 1.2em; margin-bottom: 10px; }
+        .btn {
+          display: inline-block;
+          margin-top: 30px;
+          padding: 15px 40px;
+          background: white;
+          color: #667eea;
+          text-decoration: none;
+          border-radius: 30px;
+          font-weight: bold;
+          transition: transform 0.2s;
+        }
+        .btn:hover { transform: scale(1.05); }
+    </style>
+    <script>
+        window.onload = function() {
+          const noteId = window.location.pathname.split('/note/')[1]?.replace('/', '');
+          if (noteId) {
+            setTimeout(() => {
+              window.location = 'infinitynotes://note/' + noteId;
+            }, 500);
+          }
+        };
+    </script>
+</head>
+<body>
+<h1>🔗 Opening Infinity Notes...</h1>
+<p>Redirecting to the app...</p>
+<p style="font-size: 0.9em; opacity: 0.8;">If the app doesn't open automatically:</p>
+<a href="https://play.google.com/store/apps/details?id=com.ehv.infinitynotes" class="btn">Download from Play Store</a>
+</body>
+</html>

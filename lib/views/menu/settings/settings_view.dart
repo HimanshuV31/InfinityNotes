@@ -6,7 +6,6 @@ import 'package:infinity_notes/utilities/generics/ui/feedback_dialog.dart';
 
 class SettingsView extends StatelessWidget {
   final String userEmail;
-
   const SettingsView({super.key, required this.userEmail});
 
   @override

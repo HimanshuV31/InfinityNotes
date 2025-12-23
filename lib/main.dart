@@ -1,3 +1,9 @@
+import 'dart:async';
+
+import 'package:app_links/app_links.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinity_notes/ai_summarize/ai_service.dart';
@@ -19,12 +25,33 @@ import 'package:infinity_notes/views/register_view.dart';
 import 'package:infinity_notes/views/verify_email_view.dart';
 import 'package:provider/provider.dart';
 
+final _appLinks = AppLinks();
+String? _pendingDeepLink;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  //
+  await Firebase.initializeApp();
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  );
+  Connectivity().onConnectivityChanged.listen((result) {
+    if (result != ConnectivityResult.none) {
+      debugPrint('Network restored: $result - Triggering Firebase reconnect');
+      FirebaseFirestore.instance.enableNetwork();
+    }
+  });
+  //
   await AIService().initializeKeys(
     geminiKey: GeminiAPIKey(),
     // openAIKey: 'OpenAIAPIKey()',
   );
+
+  final initialLink = await _appLinks.getInitialLink();
+  if (initialLink != null) {
+    _pendingDeepLink = initialLink.toString();
+  }
   await AppVersion.init();
   EmailJSFeedbackService.init();
   runApp(
@@ -38,9 +65,31 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  StreamSubscription<Uri>? _linkSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      if (uri.host == 'note' && uri.pathSegments.length == 1) {
+        _pendingDeepLink = uri.toString();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
@@ -51,7 +100,26 @@ class MyApp extends StatelessWidget {
           theme: _buildLightTheme(),
           darkTheme: _buildDarkTheme(),
           themeMode: notifier.themeMode,
-          home: const HomePage(),
+          home: Builder(
+            builder: (context) {
+              // ✅ Dispatch initialization once app is built
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final authBloc = context.read<AuthBloc>();
+                if (authBloc.state is AuthStateUninitialized) {
+                  debugPrint('🔥 Dispatching AuthEventInitialize from MyApp');
+                  authBloc.add(const AuthEventInitialize());
+                }
+
+                // Handle deep link
+                if (_pendingDeepLink != null) {
+                  handleDeepLink(context, Uri.parse(_pendingDeepLink!));
+                  _pendingDeepLink = null;
+                }
+              });
+
+              return const HomePage();
+            },
+          ),
           routes: {
             CreateUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
           },
@@ -70,19 +138,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<AuthBloc>().add(const AuthEventInitialize());
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,27 +153,26 @@ class _HomePageState extends State<HomePage> {
         } else {
           LoadingScreen().hide();
         }
+
         if (state is AuthStateNeedsEmailVerification) {
-          final bool? _shouldVerify = await showWarningDialog(
+          final shouldVerify = await showWarningDialog(
             context: context,
             title: "Verification Pending",
             message: "Please verify your email to continue.",
             buttonText: "Verify Now",
           );
-          if (_shouldVerify == true) {
-            if (!mounted) return;
+          if (shouldVerify == true) {
             context.read<AuthBloc>().add(const AuthEventShouldVerifyEmail());
           }
         }
-        if (state is AuthStateNavigateToVerifyEmail) {
-          const VerifyEmailView();
-        }
+
         if (state is AuthStateLoggedOut && !state.isLoading) {
-          if (!mounted) return;
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
       },
       builder: (context, state) {
+        debugPrint('🔍 Auth state: ${state.runtimeType}');
+
         if (state is AuthStateLoggedIn) {
           return const NotesView();
         } else if (state is AuthStateNavigateToVerifyEmail) {
@@ -128,12 +184,39 @@ class _HomePageState extends State<HomePage> {
         } else if (state is AuthStateForgotPassword && state.hasSentEmail) {
           return const LoginView();
         } else {
+          // AuthStateUninitialized or unknown
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
       },
     );
+  }
+}
+
+void handleDeepLink(BuildContext context, Uri uri) {
+  debugPrint('Deep link received: $uri');
+  if (uri.host == 'note' && uri.pathSegments.length == 1) {
+    final noteId = uri.pathSegments[0];
+
+    final authBloc = BlocProvider.of<AuthBloc>(context);
+    final currentState = authBloc.state;
+
+    if (currentState is AuthStateLoggedIn) {
+      Navigator.of(context).pushNamed(
+        CreateUpdateNoteRoute,
+        arguments: {'noteId': noteId, 'isEditing': true},
+      );
+    } else {
+      showCustomRoutingDialog(
+        context: context,
+        title: "Login Required",
+        content: "Please login to access this feature.",
+        routeButtonText: "Login",
+        onRoutePressed: () => authBloc.add(const AuthEventLogOut()),
+        cancelButtonText: "Cancel",
+      );
+    }
   }
 }
 
@@ -145,7 +228,8 @@ ThemeData _buildLightTheme() {
     scaffoldBackgroundColor: const Color(0xFFF5F5F5),
 
     colorScheme: const ColorScheme.light(
-      primary: Color(0xFF3993ad), // Teal
+      primary: Color(0xFF3993ad),
+      // Teal
       onPrimary: Colors.white,
       inversePrimary: Colors.black,
       surface: Colors.white,
@@ -170,9 +254,7 @@ ThemeData _buildLightTheme() {
       ),
     ),
 
-    textTheme: const TextTheme(
-      bodySmall: TextStyle(color: Colors.black54),
-    ),
+    textTheme: const TextTheme(bodySmall: TextStyle(color: Colors.black54)),
 
     dividerColor: Colors.black12,
     disabledColor: Colors.grey,
@@ -187,7 +269,8 @@ ThemeData _buildDarkTheme() {
     scaffoldBackgroundColor: const Color(0xFF202124),
 
     colorScheme: const ColorScheme.dark(
-      primary: Color(0xFF3993ad), // Same teal
+      primary: Color(0xFF3993ad),
+      // Same teal
       onPrimary: Colors.white,
       inversePrimary: Colors.white,
       // Notes = Pure Black
@@ -214,9 +297,7 @@ ThemeData _buildDarkTheme() {
       ),
     ),
 
-    textTheme: const TextTheme(
-      bodySmall: TextStyle(color: Colors.white54),
-    ),
+    textTheme: const TextTheme(bodySmall: TextStyle(color: Colors.white54)),
 
     dividerColor: Colors.white12,
     disabledColor: Colors.grey,
