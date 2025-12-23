@@ -33,6 +33,16 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="infinitynotes" android:host="note"/>
+                <data
+                    android:scheme="https"
+                    android:host="himanshuv31.github.io"
+                    android:pathPrefix="/InfinityNotes/note"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="infinitynotes"/>
             </intent-filter>
         </activity>
 
