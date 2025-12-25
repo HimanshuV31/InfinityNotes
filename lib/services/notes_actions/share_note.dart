@@ -7,7 +7,7 @@ Future<void> shareNote({
   required BuildContext context,
 }) async {
   final noteId = note.documentId;
-  final deepLink = 'https://himanshuv31.github.io/InfinintyNotes/note/$noteId';
+  final deepLink = 'https://himanshuv31.github.io/InfinityNotes/note/$noteId';
 
   final shareText = note.title.isNotEmpty
       ? '${note.title}\n\n$deepLink\n\nShared via Infinity Notes'

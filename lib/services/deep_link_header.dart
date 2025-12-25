@@ -31,11 +31,11 @@ class DeepLinkHandler {
     debugPrint('Deep link received: $uri');
 
     // Extract note ID from path
-    // Format: infinitynotes://note/NOTE_ID or https://himanshuv31.github.io/InfinintyNotes/note/NOTE_ID
+    // Format: infinitynotes://note/NOTE_ID or https://himanshuv31.github.io/InfinityNotes/note/NOTE_ID
     final segments = uri.pathSegments;
 
     // Handle both URL formats
-    // GitHub Pages: /InfinintyNotes/note/abc123 → segments = ['InfinintyNotes', 'note', 'abc123']
+    // GitHub Pages: /InfinityNotes/note/abc123 → segments = ['InfinityNotes', 'note', 'abc123']
     // Custom scheme: /note/abc123 → segments = ['note', 'abc123']
 
     String? noteId;

@@ -1,10 +1,11 @@
 <manifest xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:label="Infinity Notes">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -16,41 +17,51 @@
             android:enableOnBackInvokedCallback="true"
             android:windowSoftInputMode="adjustResize"
             tools:targetApi="33">
+
+            <!-- Flutter metadata -->
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
-
             <meta-data
                 android:name="flutterEmbedding"
                 android:value="2" />
-            <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
+            <meta-data
+                android:name="flutter_deeplinking_enabled"
+                android:value="true" />
+
+            <!-- App launcher intent -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- HTTPS App Links (verified deep links) -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="infinitynotes" android:host="note"/>
                 <data
                     android:scheme="https"
                     android:host="himanshuv31.github.io"
                     android:pathPrefix="/InfinityNotes/note"/>
             </intent-filter>
+
+            <!-- Custom scheme deep links (fallback) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="infinitynotes"/>
+                <data
+                    android:scheme="infinitynotes"
+                    android:host="note"/>
             </intent-filter>
+
         </activity>
 
-        <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
+        <!-- Duplicate meta-data removed (already above) -->
     </application>
 
+    <!-- Permission queries for sharing and deep linking -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
@@ -65,4 +76,5 @@
             <data android:scheme="https"/>
         </intent>
     </queries>
+
 </manifest>

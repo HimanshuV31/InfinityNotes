@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinity_notes/services/cloud/cloud_note.dart';
 import 'package:infinity_notes/services/cloud/firebase_cloud_storage.dart';
-import 'package:infinity_notes/services/notes_actions/share_note.dart';
 import 'package:infinity_notes/services/search/bloc/search_bloc.dart';
 import 'package:infinity_notes/services/search/bloc/search_event.dart';
 import 'package:infinity_notes/services/search/bloc/search_state.dart';
 import 'package:infinity_notes/utilities/ai/ai_helper.dart';
 import 'package:infinity_notes/utilities/generics/ui/custom_toast.dart';
 import 'package:infinity_notes/utilities/generics/ui/dialogs.dart';
+import 'package:infinity_notes/utilities/generics/ui/share_note_dialog.dart';
 
 Future<String?> showNoteActionsDialog({
   required BuildContext context,
@@ -46,6 +46,7 @@ Future<String?> showNoteActionsDialog({
                 color: Theme.of(context).dividerColor,
               ),
 
+              // AI Summary option
               InkWell(
                 onTap: () => Navigator.pop(context, 'ai_summary'),
                 child: Padding(
@@ -78,6 +79,8 @@ Future<String?> showNoteActionsDialog({
                 thickness: 1,
                 color: Theme.of(context).dividerColor,
               ),
+
+              // Share option
               InkWell(
                 onTap: () => Navigator.pop(context, 'share'),
                 child: Padding(
@@ -97,9 +100,12 @@ Future<String?> showNoteActionsDialog({
                   ),
                 ),
               ),
+
               Divider(
                 color: Theme.of(context).dividerColor,
               ),
+
+              // Delete option
               InkWell(
                 onTap: () => Navigator.pop(context, 'delete'),
                 child: Padding(
@@ -142,6 +148,7 @@ Future<void> handleLongPressNote({
   );
 
   if (action == null) return;
+
   switch (action) {
     case 'ai_summary':
       if (AIHelper.canSummarizeContent(note.text)) {
@@ -155,12 +162,20 @@ Future<void> handleLongPressNote({
         );
       } else {
         showCustomToast(
-            context, "Note content is empty or too short to summarize");
+          context,
+          "Note content is empty or too short to summarize",
+        );
       }
       break;
+
     case 'share':
-      shareNote(note: note, context: context);
+    // Updated: Call new dual-share dialog
+      await showShareNoteDialog(
+        context: context,
+        note: note,
+      );
       break;
+
     case 'delete':
       final confirm = await showDeleteDialog(context: context);
       if (confirm) {
