@@ -1,20 +1,30 @@
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuthException, FirebaseAuth, OAuthProvider, GoogleAuthProvider;
-import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:infinity_notes/services/auth/auth_exception.dart';
-import 'package:infinity_notes/services/auth/auth_provider.dart';
+import 'package:infinity_notes/services/auth/i_auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:infinity_notes/services/auth/auth_user.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:infinity_notes/services/platform/platform_utils.dart';
-import 'package:infinity_notes/firebase_options.dart';
 
-class FirebaseAuthProvider implements AuthProvider {
+class FirebaseAuthProvider implements IAuthService {
+  // Store injected dependencies as final fields
+  final FirebaseAuth _firebaseAuth;
+  final FirebaseFirestore _firebaseFirestore;
+
+  // Constructor accepts dependencies from outside
+  FirebaseAuthProvider({
+    required FirebaseAuth firebaseAuth,
+    required FirebaseFirestore firebaseFirestore,
+  })  : _firebaseAuth = firebaseAuth,
+        _firebaseFirestore = firebaseFirestore;
+
   @override
   Future<void> initialize() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    // Firebase initialization moved to main.dart
+    // This method is now a no-op placeholder for future auth setup
+    // (e.g., token refresh listeners, session management)
   }
 
   @override
@@ -23,7 +33,7 @@ class FirebaseAuthProvider implements AuthProvider {
     required String password,
   }) async {
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -42,7 +52,7 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   AuthUser? get currentUser {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseAuth.currentUser;
     if (user != null) {
       return AuthUser.fromFirebase(user);
     }
@@ -55,13 +65,13 @@ class FirebaseAuthProvider implements AuthProvider {
     required String password,
   }) async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       // Reload user to get latest profile data
-      await FirebaseAuth.instance.currentUser?.reload();
+      await _firebaseAuth.currentUser?.reload();
       final user = currentUser;
 
       if (user != null) {
@@ -78,10 +88,10 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   Future<AuthUser?> reloadUser() async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseAuth.currentUser;
     if (user != null) {
       await user.reload();
-      final refreshedUser = FirebaseAuth.instance.currentUser;
+      final refreshedUser = _firebaseAuth.currentUser;
       if (refreshedUser != null) {
         return AuthUser.fromFirebase(refreshedUser);
       }
@@ -92,7 +102,7 @@ class FirebaseAuthProvider implements AuthProvider {
   @override
   Future<void> sendEmailVerification() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = _firebaseAuth.currentUser;
       if (user != null) {
         await user.sendEmailVerification();
       } else {
@@ -108,9 +118,9 @@ class FirebaseAuthProvider implements AuthProvider {
   @override
   Future<void> signOut() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = _firebaseAuth.currentUser;
       if (user != null) {
-        await FirebaseAuth.instance.signOut();
+        await _firebaseAuth.signOut();
       } else {
         throw const UserNotFoundAuthException();
       }
@@ -124,7 +134,7 @@ class FirebaseAuthProvider implements AuthProvider {
   @override
   Future<void> sendPasswordReset({required String email}) async {
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromCode(e.code);
     } catch (e) {
@@ -136,7 +146,7 @@ class FirebaseAuthProvider implements AuthProvider {
   Future<AuthUser?> logInWithGoogle() async {
     try {
       if (PlatformUtils.isWeb) {
-        final userCred = await FirebaseAuth.instance.signInWithPopup(
+        final userCred = await _firebaseAuth.signInWithPopup(
           GoogleAuthProvider(),
         );
         return userCred.user != null
@@ -154,7 +164,7 @@ class FirebaseAuthProvider implements AuthProvider {
       }
 
       final oauth = GoogleAuthProvider.credential(idToken: idToken);
-      final userCred = await FirebaseAuth.instance.signInWithCredential(oauth);
+      final userCred = await _firebaseAuth.signInWithCredential(oauth);
 
       return userCred.user != null
           ? AuthUser.fromFirebase(userCred.user!)
@@ -181,7 +191,7 @@ class FirebaseAuthProvider implements AuthProvider {
         accessToken: appleCredential.authorizationCode,
       );
 
-      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+      final userCredential = await _firebaseAuth.signInWithCredential(
         oauthCredential,
       );
 

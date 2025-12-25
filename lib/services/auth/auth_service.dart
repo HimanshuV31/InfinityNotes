@@ -1,55 +1,58 @@
-import 'package:infinity_notes/services/auth/auth_user.dart' as local_auth;
-import 'auth_provider.dart'as local_auth;
-import 'firebase_auth_provider.dart';
+import 'package:infinity_notes/services/auth/auth_user.dart';
+import 'package:infinity_notes/services/auth/i_auth_service.dart';
+import 'package:infinity_notes/core/dependency_injection/service_locator.dart';
 
-class AuthService implements local_auth.AuthProvider {
-  final local_auth.AuthProvider provider;
+class AuthService implements IAuthService {
+  final IAuthService provider;
+
   const AuthService(this.provider);
 
-  factory AuthService.firebase() => AuthService(FirebaseAuthProvider() as local_auth.AuthProvider);
+  factory AuthService.firebase() => AuthService(getIt<IAuthService>());
 
   @override
-  Future<local_auth.AuthUser> createUser({
+  Future<AuthUser> createUser({
     required String email,
     required String password,
-  }) {
-    return provider.createUser(email: email, password: password);
+  }) async {
+    return await provider.createUser(
+      email: email,
+      password: password,
+    );
   }
 
   @override
-  local_auth.AuthUser? get currentUser => provider.currentUser;
-
-  @override
-  Future<local_auth.AuthUser> logIn({
+  Future<AuthUser> logIn({
     required String email,
     required String password,
-  }) async
-  {
-    return provider.logIn(email: email, password: password);
+  }) async {
+    return await provider.logIn(
+      email: email,
+      password: password,
+    );
   }
+
+  @override
+  Future<void> signOut() => provider.signOut();
 
   @override
   Future<void> sendEmailVerification() => provider.sendEmailVerification();
 
   @override
-  Future<void> signOut() => provider.signOut();
+  Future<void> initialize() => provider.initialize();
+
+  @override
+  AuthUser? get currentUser => provider.currentUser;
 
   @override
   Future<void> sendPasswordReset({required String email}) =>
       provider.sendPasswordReset(email: email);
 
   @override
-  Future<void> initialize() async => await provider.initialize();
+  Future<AuthUser?> logInWithGoogle() => provider.logInWithGoogle();
 
   @override
-  Future<local_auth.AuthUser?> logInWithApple() async =>
-      provider.logInWithApple();
+  Future<AuthUser?> logInWithApple() => provider.logInWithApple();
 
   @override
-  Future<local_auth.AuthUser?> logInWithGoogle() async =>
-      provider.logInWithGoogle();
-
-  @override
-  Future<local_auth.AuthUser?> reloadUser() => provider.reloadUser();
-
+  Future<AuthUser?> reloadUser() => provider.reloadUser();
 }
