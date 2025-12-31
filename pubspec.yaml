@@ -1,0 +1,79 @@
+name: infinity_notes
+description: "Infinity Notes app."
+publish_to: 'none'
+
+version: 1.0.5+7
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  firebase_core: ^4.0.0
+  firebase_auth: ^6.0.1
+  cloud_firestore: ^6.0.0
+  firebase_storage: ^13.0.0
+  rename_app: ^1.6.5
+  google_sign_in: ^7.1.1
+  sign_in_with_apple: ^7.0.1
+  sqflite: ^2.4.2
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  flutter_staggered_grid_view: ^0.7.0
+  share_plus: ^12.0.1
+  bloc: ^9.0.0
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.3
+  go_router: ^17.0.1
+#  flutter_localization: ^0.3.3
+  intl: ^0.20.2
+  shared_preferences: ^2.2.2
+  url_launcher: ^6.2.1
+  flutter_linkify: ^6.0.0
+  http: ^1.2.0
+  flutter_secure_storage: ^10.0.0
+  package_info_plus: ^9.0.0  # Get app version info
+  device_info_plus: ^12.3.0
+  emailjs: ^4.0.0
+  provider: ^6.1.1
+  cached_network_image: ^3.3.0
+  app_links: ^7.0.0
+  connectivity_plus: ^7.0.0
+  get_it: ^9.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.7
+  flutter_launcher_icons: 0.14.4
+  test: ^1.25.15
+  flutter_dotenv: ^6.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/images/
+
+# ---- Splash screen ----
+flutter_native_splash:
+  color: "#3993ad"
+  image: assets/icons/Infinity_Notes_Splash.png
+  android: true
+  ios: true
+  android_gravity: center
+
+
+# ---- App icons ----
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: assets/icons/Infinity_Notes_Icon.png
+  adaptive_icon_background: "#3993ad"
+  adaptive_icon_foreground: assets/icons/Infinity_Notes_Icon.png
+  adaptive_icon_foreground_padding: 20  # prevents icon from zooming
+  remove_alpha_ios: true
