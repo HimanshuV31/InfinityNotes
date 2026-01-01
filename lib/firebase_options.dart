@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyApmWjX6lnE8bjfa1dQKbXCgj4K0ZLure4',
-    appId: '1:184549952540:android:fe89e828e2333fa8c723d9',
+    appId: '1:184549952540:android:53593e97045a6f3cc723d9',
     messagingSenderId: '184549952540',
     projectId: 'infinity-notes-3101',
     storageBucket: 'infinity-notes-3101.firebasestorage.app',
@@ -60,24 +60,24 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCGpl_4NbyaT02cb3f2g6kS2jGDw3jhOpY',
-    appId: '1:184549952540:ios:8bbf4c4535e7c80fc723d9',
+    appId: '1:184549952540:ios:5cc3b90b2158c292c723d9',
     messagingSenderId: '184549952540',
     projectId: 'infinity-notes-3101',
     storageBucket: 'infinity-notes-3101.firebasestorage.app',
     androidClientId: '184549952540-7veuto0nlvtmmk81uq9b91219n8jncov.apps.googleusercontent.com',
-    iosClientId: '184549952540-s692b5gcjatjbumn8e9cfm7d353c9e9v.apps.googleusercontent.com',
-    iosBundleId: 'com.ehv.infinitynotes',
+    iosClientId: '184549952540-sjqfds1hst2ubep1m712pprl3tccg6u0.apps.googleusercontent.com',
+    iosBundleId: 'com.ehv.infinityNotes',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCGpl_4NbyaT02cb3f2g6kS2jGDw3jhOpY',
-    appId: '1:184549952540:ios:8bbf4c4535e7c80fc723d9',
+    appId: '1:184549952540:ios:5cc3b90b2158c292c723d9',
     messagingSenderId: '184549952540',
     projectId: 'infinity-notes-3101',
     storageBucket: 'infinity-notes-3101.firebasestorage.app',
     androidClientId: '184549952540-7veuto0nlvtmmk81uq9b91219n8jncov.apps.googleusercontent.com',
-    iosClientId: '184549952540-s692b5gcjatjbumn8e9cfm7d353c9e9v.apps.googleusercontent.com',
-    iosBundleId: 'com.ehv.infinitynotes',
+    iosClientId: '184549952540-sjqfds1hst2ubep1m712pprl3tccg6u0.apps.googleusercontent.com',
+    iosBundleId: 'com.ehv.infinityNotes',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

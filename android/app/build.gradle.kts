@@ -5,18 +5,18 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services")  // ✅ Firebase plugin
+    id("com.google.gms.google-services") // Firebase plugin
 }
 
 android {
     namespace = "com.ehv.infinity_notes"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     defaultConfig {
         applicationId = "com.ehv.infinity_notes"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 29
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -43,12 +43,12 @@ android {
             isShrinkResources = false
         }
     }
-}
 
-// Kotlin compiler target (replaces deprecated android.kotlinOptions.jvmTarget)
-tasks.withType<KotlinJvmCompile>().configureEach {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
+    // Kotlin compiler target (replaces deprecated android.kotlinOptions.jvmTarget)
+    tasks.withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 }
 
@@ -57,17 +57,15 @@ flutter {
 }
 
 dependencies {
-    // ✅ Firebase BoM
+    // Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
-
-    // ✅ Firebase Analytics (no version needed with BoM)
+    // Firebase Analytics (no version needed with BoM)
     implementation("com.google.firebase:firebase-analytics")
-
-    // Add other Firebase products here as needed:
-     implementation("com.google.firebase:firebase-auth")
-     implementation("com.google.firebase:firebase-firestore")
-     implementation("com.google.firebase:firebase-storage")
-
+    // Firebase products
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-storage")
+    // AndroidX
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.core:core-splashscreen:1.2.0")
 }
