@@ -1,35 +1,103 @@
-﻿# Flutter
+# ----------------------------
+# Miscellaneous
+# ----------------------------
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# ----------------------------
+# IDE / Editor
+# ----------------------------
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code (comment out if you want to share workspace settings)
+.vscode/
+
+# ----------------------------
+# Flutter / Dart / Pub
+# ----------------------------
+**/doc/api/
+**/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
-.packages
 .pub-cache/
 .pub/
 build/
-*.iml
-.idea/
-*.ipr
-*.iws
-.vscode/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
 
-# Android
-*.iml
+# ----------------------------
+# Symbolication / Obfuscation
+# ----------------------------
+app.*.symbols
+app.*.map.json
+
+# ----------------------------
+# Android / Gradle
+# ----------------------------
+/android/app/debug
+/android/app/profile
+/android/app/release
 .gradle/
-local.properties
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/assetWizardSettings.xml
-.idea/dictionaries
-.idea/libraries/
-*.jks
-*.keystore
+**/gradle-wrapper.jar
+/local.properties
 
-# Firebase
-google-services.json.bak
-firebase_app_id_file.json
+# ----------------------------
+# Firebase (KEEP SECRET!)
+# ----------------------------
+# Android
+android/app/google-services.json
+# iOS
+ios/Runner/GoogleService-Info.plist
+# FlutterFire options file
+lib/firebase_options.dart
+
+# ----------------------------
+# iOS / Xcode
+# ----------------------------
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/.generated/
+
+# ----------------------------
+# OS / Build artifacts
+# ----------------------------
+*.exe
+*.dll
+*.so
+*.dylib
+*.db
+*.tgz
+*.bak
+*.tmp
+*.lock
+
+# ----------------------------
+# Splash / Launcher (Optional)
+# ----------------------------
+# Generated icons / splash screens, if you want to avoid committing
+android/app/src/main/res/mipmap-*/ic_launcher.png
+android/app/src/main/res/drawable*/launch_background.xml
+ios/Runner/Assets.xcassets/AppIcon.appiconset/
+ios/Runner/Assets.xcassets/LaunchImage.imageset/
+
+#-------------------------------
+# API Keys
+#-------------------------------
+android/key.properties
+.env
+*.env

@@ -7,6 +7,7 @@ import 'package:infinity_notes/services/auth/i_auth_service.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(IAuthService authService) : super(const AuthStateUninitialized(isLoading: true)) {
     //Initialize
+    add(const AuthEventInitialize());
     on<AuthEventInitialize>((event, emit) async {
       try {
         await authService.initialize();
