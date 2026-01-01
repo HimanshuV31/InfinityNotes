@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")  // ✅ Firebase plugin
 }
 
 android {
@@ -30,16 +31,13 @@ android {
             // Temporary: uses debug keystore so release build can generate.
             // Replace with a real signingConfigs { create("release") { ... } } before Play Store.
             signingConfig = signingConfigs.getByName("debug")
-
             isMinifyEnabled = true
             isShrinkResources = true
-
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
-
         debug {
             isMinifyEnabled = false
             isShrinkResources = false
@@ -47,7 +45,7 @@ android {
     }
 }
 
-// Kotlin compiler target (replaces deprecated android.kotlinOptions.jvmTarget) [web:111]
+// Kotlin compiler target (replaces deprecated android.kotlinOptions.jvmTarget)
 tasks.withType<KotlinJvmCompile>().configureEach {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
@@ -56,4 +54,20 @@ tasks.withType<KotlinJvmCompile>().configureEach {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // ✅ Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+
+    // ✅ Firebase Analytics (no version needed with BoM)
+    implementation("com.google.firebase:firebase-analytics")
+
+    // Add other Firebase products here as needed:
+     implementation("com.google.firebase:firebase-auth")
+     implementation("com.google.firebase:firebase-firestore")
+     implementation("com.google.firebase:firebase-storage")
+
+    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.core:core-splashscreen:1.2.0")
 }

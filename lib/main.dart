@@ -6,6 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // ✅ ADD THIS IMPORT
 import 'package:infinity_notes/constants/routes.dart';
 import 'package:infinity_notes/helpers/loading/loading_screen.dart';
 import 'package:infinity_notes/services/auth/bloc/auth_bloc.dart';
@@ -25,7 +26,7 @@ import 'package:infinity_notes/core/dependency_injection/service_locator.dart';
 final _appLinks = AppLinks();
 String? _pendingDeepLink;
 
-Future<void> main() async {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // ✅ Step 1: Initialize Firebase ONCE
@@ -45,24 +46,27 @@ Future<void> main() async {
     }
   });
 
-  // ✅ Step 4: Setup GetIt service locator (handles AI, EmailJS, Auth)
+  // ✅ Step 4: Load .env file FIRST (CRITICAL FIX)
+  await dotenv.load(fileName: ".env");
+
+  // ✅ Step 5: Setup GetIt service locator (now can safely read API keys)
   await setupServiceLocator();
 
-  // ✅ Step 5: Handle deep linking
+  // ✅ Step 6: Handle deep linking
   final initialLink = await _appLinks.getInitialLink();
   if (initialLink != null) {
     _pendingDeepLink = initialLink.toString();
   }
 
-  // ✅ Step 6: Initialize app version
+  // ✅ Step 7: Initialize app version
   await AppVersion.init();
 
-  // ✅ Step 7: Run app with GetIt-managed dependencies
+  // ✅ Step 8: Run app with GetIt-managed dependencies
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => getIt<ThemeNotifier>()),  // ← FROM GETIT
-        BlocProvider(create: (context) => getIt<AuthBloc>()),           // ← FROM GETIT
+        ChangeNotifierProvider(create: (_) => getIt<ThemeNotifier>()),
+        BlocProvider(create: (context) => getIt<AuthBloc>()),
       ],
       child: const MyApp(),
     ),
@@ -77,7 +81,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamSubscription<Uri>? _linkSubscription;
+  StreamSubscription? _linkSubscription;
 
   @override
   void initState() {
@@ -113,13 +117,11 @@ class _MyAppState extends State<MyApp> {
                   debugPrint('🔥 Dispatching AuthEventInitialize from MyApp');
                   authBloc.add(const AuthEventInitialize());
                 }
-
                 if (_pendingDeepLink != null) {
                   handleDeepLink(context, Uri.parse(_pendingDeepLink!));
                   _pendingDeepLink = null;
                 }
               });
-
               return const HomePage();
             },
           ),
@@ -156,7 +158,6 @@ class HomePage extends StatelessWidget {
         } else {
           LoadingScreen().hide();
         }
-
         if (state is AuthStateNeedsEmailVerification) {
           final shouldVerify = await showWarningDialog(
             context: context,
@@ -168,14 +169,12 @@ class HomePage extends StatelessWidget {
             context.read<AuthBloc>().add(const AuthEventShouldVerifyEmail());
           }
         }
-
         if (state is AuthStateLoggedOut && !state.isLoading) {
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
       },
       builder: (context, state) {
         debugPrint('🔍 Auth state: ${state.runtimeType}');
-
         if (state is AuthStateLoggedIn) {
           return const NotesView();
         } else if (state is AuthStateNavigateToVerifyEmail) {
@@ -200,10 +199,8 @@ void handleDeepLink(BuildContext context, Uri uri) {
   debugPrint('Deep link received: $uri');
   if (uri.host == 'note' && uri.pathSegments.length == 1) {
     final noteId = uri.pathSegments[0];
-
     final authBloc = BlocProvider.of<AuthBloc>(context);
     final currentState = authBloc.state;
-
     if (currentState is AuthStateLoggedIn) {
       Navigator.of(context).pushNamed(
         CreateUpdateNoteRoute,
