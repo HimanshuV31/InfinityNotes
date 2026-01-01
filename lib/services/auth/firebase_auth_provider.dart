@@ -145,20 +145,27 @@ class FirebaseAuthProvider implements IAuthService {
   @override
   Future<AuthUser?> logInWithGoogle() async {
     try {
+      // Web implementation
       if (PlatformUtils.isWeb) {
-        final userCred = await _firebaseAuth.signInWithPopup(
-          GoogleAuthProvider(),
-        );
-        return userCred.user != null
-            ? AuthUser.fromFirebase(userCred.user!)
-            : null;
+        final userCred = await _firebaseAuth.signInWithPopup(GoogleAuthProvider());
+        return userCred.user != null ? AuthUser.fromFirebase(userCred.user!) : null;
       }
 
+      // Mobile/Desktop - v7.2.0 implementation
       final gsi = GoogleSignIn.instance;
+
+      // Initialize first (v7.2.0 requirement)
       await gsi.initialize();
 
+      // Use authenticate() instead of signIn()
       final account = await gsi.authenticate();
-      final idToken = (account.authentication).idToken;
+
+      if (account == null) {
+        // User cancelled sign-in
+        return null;
+      }
+
+      final idToken = account.authentication.idToken;
       if (idToken == null) {
         throw GenericAuthException('missing-id-token');
       }
@@ -166,15 +173,14 @@ class FirebaseAuthProvider implements IAuthService {
       final oauth = GoogleAuthProvider.credential(idToken: idToken);
       final userCred = await _firebaseAuth.signInWithCredential(oauth);
 
-      return userCred.user != null
-          ? AuthUser.fromFirebase(userCred.user!)
-          : null;
+      return userCred.user != null ? AuthUser.fromFirebase(userCred.user!) : null;
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromCode(e.code);
     } catch (e) {
-      throw GenericAuthException("$e");
+      throw GenericAuthException(e.toString());
     }
   }
+
 
   @override
   Future<AuthUser?> logInWithApple() async {
