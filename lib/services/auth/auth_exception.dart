@@ -37,6 +37,7 @@ abstract class AuthException implements Exception {
         return const GenericAuthException('popup-blocked');
       case 'popup-closed-by-user':
         return const GenericAuthException('popup-closed-by-user');
+
       default:
         return GenericAuthException(code);
     }
@@ -187,6 +188,28 @@ class PopupTimeoutAuthException extends AuthException {
   @override
   // TODO: implement title
   String get title => ErrorMessages.getAuthErrorTitle('popup-timeout');
+}
+// Apple Sign-In specific exceptions
+class AppleSignInIdentityTokenNullException extends AuthException {
+  const AppleSignInIdentityTokenNullException()
+      : super('apple-signin-identity-token-null');
+
+  @override
+  String get message => ErrorMessages.getAuthErrorMessage('apple-signin-identity-token-null');
+
+  @override
+  String get title => ErrorMessages.getAuthErrorTitle('apple-signin-identity-token-null');
+}
+
+class AppleSignInUserCancelledException extends AuthException {
+  const AppleSignInUserCancelledException()
+      : super('apple-signin-user-cancelled');
+
+  @override
+  String get message => ErrorMessages.getAuthErrorMessage('apple-signin-user-cancelled');
+
+  @override
+  String get title => ErrorMessages.getAuthErrorTitle('apple-signin-user-cancelled');
 }
 
 class GenericAuthException extends AuthException {
