@@ -76,17 +76,32 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
     });
     //Apple Login
+    //Apple Login
     on<AuthEventAppleSignIn>((event, emit) async {
       emit(const AuthStateLoggedOut(exception: null, isLoading: true));
       try {
         final user = await authService.logInWithApple();
-        if(user!=null){
-          emit( AuthStateLoggedIn(user:user, isLoading: false));
+        if (user != null) {
+          emit(AuthStateLoggedIn(user: user, isLoading: false));
+        } else {
+          // ✅ FIX: Handle null return (shouldn't happen with new throw logic, but defensive)
+          emit(const AuthStateLoggedOut(
+            exception: GenericAuthException('apple-signin-null-user'),
+            isLoading: false,
+          ));
         }
       } on AuthException catch (e) {
+        // Your custom auth exceptions (from sign_in_with_apple.dart)
         emit(AuthStateLoggedOut(exception: e, isLoading: false));
+      } on Exception catch (e) {
+        // ✅ FIX: Catch generic exceptions (network errors, etc.)
+        emit(AuthStateLoggedOut(
+          exception: GenericAuthException(e.toString()),
+          isLoading: false,
+        ));
       }
     });
+
     //Logout
     on<AuthEventLogOut>((event, emit) async {
       try {
