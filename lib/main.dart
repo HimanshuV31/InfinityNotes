@@ -26,7 +26,7 @@ import 'package:provider/provider.dart';
 // ============================================================================
 final _appLinks = AppLinks();
 String? _pendingDeepLink;
-StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription; // ✅ FIXED TYPE
+StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
 // ============================================================================
 // MAIN ENTRY POINT

@@ -30,6 +30,10 @@ class ErrorMessages {
         return 'Popup closed by user.';
       case 'popup-timeout':
         return 'Popup timed out.';
+      case 'apple-signin-identity-token-null':
+        return 'Apple Sign-In failed: This is a known iOS simulator bug. Please test on a real device or use Email/Google Sign-In for simulator testing.';
+      case 'apple-signin-user-cancelled':
+        return 'Sign-in was cancelled. Please try again if you want to continue.';
       default:
         return "An unexpected error occurred.: '$errorCode'.";
     }
@@ -63,6 +67,10 @@ class ErrorMessages {
         return 'Popup Closed by User';
       case 'popup-timeout':
         return 'Popup Timeout';
+      case 'apple-signin-identity-token-null':
+        return 'Simulator Not Supported';
+      case 'apple-signin-user-cancelled':
+        return 'Sign-In Cancelled';
       default:
         return 'Unexpected Error';
     }
