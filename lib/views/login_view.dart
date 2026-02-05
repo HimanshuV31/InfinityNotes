@@ -20,6 +20,7 @@ class _LoginViewState extends State<LoginView> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final auth = AuthService.firebase();
+  final bool hasAppleDevAccount = false;
 
   Future<void> login() async {
     final email = emailController.text.trim();
@@ -61,154 +62,203 @@ class _LoginViewState extends State<LoginView> {
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor!,
           foregroundColor: Theme.of(context).appBarTheme.foregroundColor!,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: emailController,
-                decoration: const InputDecoration(labelText: "Email"),
-              ),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: "Password"),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: login,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: backgroundColor,
-                  foregroundColor: foregroundColor,
-                ),
-                child: const Text("Login"),
-              ),
-              Row(
+        body: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            final isLoading = state is AuthStateLoggedOut && state.isLoading;
+
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Registration button
-                  TextButton(
-                    onPressed: () {
-                      context
-                          .read<AuthBloc>()
-                          .add(const AuthEventShouldRegister());
-                    },
-                    child: const Text("New User? Register."),
+                  TextField(
+                    controller: emailController,
+                    decoration: const InputDecoration(labelText: "Email"),
+                    enabled: !isLoading, // ✅ Disable during loading
+                  ),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(labelText: "Password"),
+                    enabled: !isLoading, // ✅ Disable during loading
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: isLoading ? null : login, // ✅ Disable during loading
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: backgroundColor,
+                      foregroundColor: foregroundColor,
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                        : const Text("Login"),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Registration button
+                      TextButton(
+                        onPressed: isLoading
+                            ? null // ✅ Disable during loading
+                            : () {
+                          context
+                              .read<AuthBloc>()
+                              .add(const AuthEventShouldRegister());
+                        },
+                        child: const Text("New User? Register."),
+                      ),
+
+                      // Password recovery button
+                      TextButton(
+                        onPressed: isLoading
+                            ? null // ✅ Disable during loading
+                            : () async {
+                          final email = emailController.text.trim();
+                          final bool isEmailValid = RegExp(
+                            r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
+                          ).hasMatch(email);
+                          if (!isEmailValid || email.isEmpty) {
+                            showWarningDialog(
+                              context: context,
+                              title: "Invalid Email",
+                              message: "Please enter a valid email address",
+                            );
+                            return;
+                          }
+                          final bool _confirm =
+                          await showConfirmDialog(context: context);
+                          if (!_confirm) return;
+                          try {
+                            if (!mounted) return;
+                            context
+                                .read<AuthBloc>()
+                                .add(AuthEventResetPassword(email: email));
+                            if (!mounted) return;
+                            showWarningDialog(
+                              context: context,
+                              title: "Reset Email Sent",
+                              message:
+                              "Password Reset email has been sent if the email is "
+                                  "registered. Otherwise, kindly do the registration.",
+                            );
+                          } on AuthException catch (e) {
+                            final authError = AuthException.fromCode(e.code);
+                            if (e.code == "invalid-credential" ||
+                                e.code == "invalid-email") {
+                              emailController.clear();
+                            }
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(authError.message)),
+                            );
+                          } catch (e) {
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Unknown Error: $e")),
+                            );
+                          }
+                        },
+                        child: const Text("Forgot Password?"),
+                      ),
+                    ],
                   ),
 
-                  // Password recovery button
-                  TextButton(
-                    onPressed: () async {
-                      final email = emailController.text.trim();
-                      final bool isEmailValid = RegExp(
-                        r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$',
-                      ).hasMatch(email);
-                      if (!isEmailValid || email.isEmpty) {
-                        showWarningDialog(
-                          context: context,
-                          title: "Invalid Email",
-                          message: "Please enter a valid email address",
-                        );
-                        return;
-                      }
-                      final bool _confirm = await showConfirmDialog(context: context);
-                      if (!_confirm) return;
-                      try {
-                        if (!mounted) return;
-                        context
-                            .read<AuthBloc>()
-                            .add(AuthEventResetPassword(email: email));
-                        if (!mounted) return;
-                        showWarningDialog(
-                          context: context,
-                          title: "Reset Email Sent",
-                          message:
-                          "Password Reset email has been sent if the email is "
-                              "registered. Otherwise, kindly do the registration.",
-                        );
-                      } on AuthException catch (e) {
-                        final authError = AuthException.fromCode(e.code);
-                        if (e.code == "invalid-credential" ||
-                            e.code == "invalid-email") {
-                          emailController.clear();
-                        }
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(authError.message)),
-                        );
-                      } catch (e) {
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Unknown Error: $e")),
-                        );
-                      }
-                    },
-                    child: const Text("Forgot Password?"),
+                  // Text stating Social Login
+                  const SizedBox(height: 17),
+                  Text(
+                    "Or sign in with a social account",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
                   ),
-                ],
-              ),
+                  const SizedBox(height: 10),
 
-              // Text stating Social Login
-              const SizedBox(height: 17),
-              Text(
-                "Or sign in with a social account",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).textTheme.bodySmall?.color,
-                ),
-              ),
-              const SizedBox(height: 10),
+                  // Row for Social Logins
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Google
+                      GestureDetector(
+                        onTap: isLoading
+                            ? null // ✅ Disable during loading
+                            : () async {
+                          context.read<AuthBloc>().add(AuthEventGoogleSignIn());
+                        },
+                        child: Opacity(
+                          opacity: isLoading ? 0.5 : 1.0, // ✅ Visual feedback
+                          child: Column(
+                            children: [
+                              Image.asset('assets/icons/google_logo.png', height: 40),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Google",
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
 
-              // Row for Social Logins
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Google
-                  GestureDetector(
-                    onTap: () async {
-                      context.read<AuthBloc>().add(AuthEventGoogleSignIn());
-                    },
-                    child: Column(
-                      children: [
-                        Image.asset('assets/icons/google_logo.png', height: 40),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Google",
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
+                      // Only add spacing + Apple button if on iOS
+                      if (PlatformUtils.isIOS && hasAppleDevAccount==true) ...[
+                        const SizedBox(width: 40),
+                        GestureDetector(
+                          onTap: isLoading
+                              ? null // ✅ Disable during loading
+                              : () async {
+                            context.read<AuthBloc>().add(const AuthEventAppleSignIn());
+                          },
+                          child: Opacity(
+                            opacity: isLoading ? 0.5 : 1.0, // ✅ Visual feedback
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Column(
+                                  children: [
+                                    Image.asset('assets/icons/apple_logo.png',
+                                        height: 40),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      "Apple",
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // ✅ Show loading spinner on Apple button
+                                if (isLoading)
+                                  const Positioned(
+                                    top: 0,
+                                    child: SizedBox(
+                                      height: 40,
+                                      width: 40,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
-                    ),
+                    ],
                   ),
-
-                  // Only add spacing + Apple button if on iOS
-                  if (PlatformUtils.isIOS) ...[
-                    const SizedBox(width: 40),
-                    GestureDetector(
-                      onTap: () async {
-                        context.read<AuthBloc>().add(AuthEventAppleSignIn());
-                      },
-                      child: Column(
-                        children: [
-                          Image.asset('assets/icons/apple_logo.png',
-                              height: 40),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Apple",
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
                 ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

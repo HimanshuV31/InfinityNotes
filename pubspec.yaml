@@ -2,7 +2,7 @@ name: infinity_notes
 description: "Infinity Notes app."
 publish_to: 'none'
 
-version: 1.0.5+7
+version: 1.0.6+8
 
 environment:
   sdk: ^3.8.1

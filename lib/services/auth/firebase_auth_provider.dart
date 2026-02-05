@@ -5,6 +5,7 @@ import 'package:infinity_notes/services/auth/auth_exception.dart';
 import 'package:infinity_notes/services/auth/i_auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:infinity_notes/services/auth/auth_user.dart';
+import 'package:infinity_notes/services/auth/sign_in_with_apple.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:infinity_notes/services/platform/platform_utils.dart';
 
@@ -31,7 +32,8 @@ class FirebaseAuthProvider implements IAuthService {
   Future<AuthUser> createUser({
     required String email,
     required String password,
-  }) async {
+  }) async
+  {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
@@ -63,7 +65,8 @@ class FirebaseAuthProvider implements IAuthService {
   Future<AuthUser> logIn({
     required String email,
     required String password,
-  }) async {
+  }) async
+  {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
@@ -185,24 +188,10 @@ class FirebaseAuthProvider implements IAuthService {
   @override
   Future<AuthUser?> logInWithApple() async {
     try {
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
+      final userCredential = await signInWithApple();  // ✅ Now uses your diagnostic version
 
-      final oauthCredential = OAuthProvider("apple.com").credential(
-        idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
-      );
-
-      final userCredential = await _firebaseAuth.signInWithCredential(
-        oauthCredential,
-      );
-
-      return userCredential.user != null
-          ? AuthUser.fromFirebase(userCredential.user!)
+      return userCredential?.user != null
+          ? AuthUser.fromFirebase(userCredential!.user!)
           : null;
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromCode(e.code);
@@ -210,4 +199,5 @@ class FirebaseAuthProvider implements IAuthService {
       throw GenericAuthException("$e");
     }
   }
+
 }

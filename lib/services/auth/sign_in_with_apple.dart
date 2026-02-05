@@ -1,12 +1,41 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:infinity_notes/services/auth/auth_exception.dart';
 
+
+/// Apple Sign-In Implementation
+///
+/// STATUS: Partially configured (pending Apple Developer account)
+///
+/// ✅ READY:
+/// - Firebase OAuth redirect URI configured
+/// - Code structure complete
+/// - Error handling implemented
+///
+/// ❌ NEEDS APPLE DEVELOPER ACCOUNT:
+/// - Service ID: com.ehv.infinitynotes.firebase (placeholder)
+/// - Team ID, Key ID, Private Key (for Firebase Console)
+///
+/// TO COMPLETE:
+/// 1. Enroll in Apple Developer Program ($99/year)
+/// 2. Follow steps in: APPLE_SIGN_IN_CONFIG.md
+/// 3. Update clientId with actual Service ID
+/// 4. Configure Firebase Console with Team ID + Auth Key
+///
+/// CURRENT BEHAVIOR:
+/// - iOS simulator: Will fail (requires Apple Developer config)
+/// - Android: Will work once Service ID added
+/// - Email/Google Sign-In: ✅ Working alternatives
+
+
+
+
 Future<UserCredential?> signInWithApple() async {
   try {
-    print('🍎 Step 1: Requesting Apple credentials...');
+    developer.log('🍎 Step 1: Requesting Apple credentials...', name: 'AppleSignIn');
 
     // Request Apple credentials
     final appleCredential = await SignInWithApple.getAppleIDCredential(
@@ -17,25 +46,29 @@ Future<UserCredential?> signInWithApple() async {
       // Web authentication options are ONLY required on Android
       webAuthenticationOptions: Platform.isAndroid
           ? WebAuthenticationOptions(
-        clientId: "com.yourcompany.serviceid", // Your Apple Service ID
+        // TODO: Replace with actual Service ID from Apple Developer Portal
+        // Format: com.ehv.infinitynotes.firebase
+        // See: APPLE_SIGN_IN_CONFIG.md
+        clientId: "com.ehv.infinityNotes.firebase", // PLACEHOLDER - Will work once Apple Developer setup complete
         redirectUri: Uri.parse(
-          "https://your-project-id.firebaseapp.com/__/auth/handler", // from Firebase console
+          "https://infinity-notes-3101.firebaseapp.com/__/auth/handler", // ✅ Ready to use
         ),
       )
           : null,
     );
 
-    print('🍎 Step 2: Got Apple credential');
-    print('  - User ID: ${appleCredential.userIdentifier}');
-    print('  - Identity Token: ${appleCredential.identityToken != null ? "EXISTS" : "NULL"}');
-    print('  - Auth Code: ${appleCredential.authorizationCode != null ? "EXISTS" : "NULL"}');
+    developer.log('🍎 Step 2: Got Apple credential', name: 'AppleSignIn');
+    developer.log('  - User ID: ${appleCredential.userIdentifier}', name: 'AppleSignIn');
+    developer.log('  - Identity Token: ${appleCredential.identityToken != null ? "EXISTS" : "NULL"}', name: 'AppleSignIn');
+    developer.log('  - Auth Code: ${appleCredential.authorizationCode != null ? "EXISTS" : "NULL"}', name: 'AppleSignIn');
 
-    // ✅ FIX: Check for null identityToken (simulator bug)
+    // ✅ FIX: Check for null identityToken (iOS simulator bug)
     if (appleCredential.identityToken == null) {
+      developer.log('🔥 THROWING: AppleSignInIdentityTokenNullException (simulator bug)', name: 'AppleSignIn');
       throw const AppleSignInIdentityTokenNullException();
     }
 
-    print('🍎 Step 3: Creating Firebase credential...');
+    developer.log('🍎 Step 3: Creating Firebase credential...', name: 'AppleSignIn');
 
     // Convert Apple credentials to Firebase credentials
     final oauthCredential = OAuthProvider("apple.com").credential(
@@ -43,29 +76,29 @@ Future<UserCredential?> signInWithApple() async {
       accessToken: appleCredential.authorizationCode,
     );
 
-    print('🍎 Step 4: Signing in with Firebase...');
+    developer.log('🍎 Step 4: Signing in with Firebase...', name: 'AppleSignIn');
 
     // Sign in with Firebase
     final userCredential =
     await FirebaseAuth.instance.signInWithCredential(oauthCredential);
 
-    print('🍎 Step 5: SUCCESS! User UID: ${userCredential.user?.uid}');
+    developer.log('🍎 Step 5: SUCCESS! User UID: ${userCredential.user?.uid}', name: 'AppleSignIn');
 
     return userCredential;
   } on FirebaseAuthException catch (e) {
     // Firebase-specific errors (network, invalid credential, etc.)
-    debugPrint("🔥 Firebase Auth Error: ${e.code} - ${e.message}");
+    developer.log('🔥 Firebase Auth Error: ${e.code} - ${e.message}', name: 'AppleSignIn', error: e);
     throw AuthException.fromCode(e.code); // Use your existing factory
   } on SignInWithAppleAuthorizationException catch (e) {
     // User cancelled Apple Sign-In or other Apple-specific error
-    debugPrint("🔥 Apple Authorization Error: ${e.code} - ${e.message}");
+    developer.log('🔥 Apple Authorization Error: ${e.code} - ${e.message}', name: 'AppleSignIn', error: e);
     if (e.code == AuthorizationErrorCode.canceled) {
       throw const AppleSignInUserCancelledException();
     }
     throw GenericAuthException('apple-signin-error: ${e.code}');
-  } catch (e) {
-    // Generic errors (network, simulator bug, etc.)
-    debugPrint("🔥 Apple Sign-In failed: $e");
+  } catch (e, stackTrace) {
+    // Generic errors (network, unexpected errors, etc.)
+    developer.log('🔥 Apple Sign-In failed: $e', name: 'AppleSignIn', error: e, stackTrace: stackTrace);
     rethrow; // Re-throw so BLoC can catch it
   }
 }
