@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:infinity_notes/services/auth/auth_service.dart';
-import 'package:infinity_notes/services/cloud/cloud_note.dart';
-import 'package:infinity_notes/services/cloud/firebase_cloud_storage.dart';
-import 'package:infinity_notes/services/notes_actions/share_note.dart';
-import 'package:infinity_notes/utilities/ai/ai_helper.dart';
-import 'package:infinity_notes/utilities/generics/ui/custom_app_bar.dart';
-import 'package:infinity_notes/utilities/generics/ui/custom_toast.dart';
-import 'package:infinity_notes/utilities/generics/ui/dialogs.dart';
+import 'package:infinitynotes/services/auth/auth_service.dart';
+import 'package:infinitynotes/services/cloud/cloud_note.dart';
+import 'package:infinitynotes/services/cloud/firebase_cloud_storage.dart';
+import 'package:infinitynotes/services/notes_actions/share_note.dart';
+import 'package:infinitynotes/utilities/ai/ai_helper.dart';
+import 'package:infinitynotes/utilities/generics/ui/custom_app_bar.dart';
+import 'package:infinitynotes/utilities/generics/ui/custom_toast.dart';
+import 'package:infinitynotes/utilities/generics/ui/dialogs.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CreateUpdateNoteView extends StatefulWidget {

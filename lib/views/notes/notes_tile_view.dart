@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:infinity_notes/services/cloud/cloud_note.dart';
-import 'package:infinity_notes/services/platform/platform_utils.dart';
-import 'package:infinity_notes/utilities/generics/ui/linkify_text.dart';
+import 'package:infinitynotes/services/cloud/cloud_note.dart';
+import 'package:infinitynotes/services/platform/platform_utils.dart';
+import 'package:infinitynotes/utilities/generics/ui/linkify_text.dart';
 
 class NotesTileView extends StatelessWidget {
   final Iterable<CloudNote> notes;

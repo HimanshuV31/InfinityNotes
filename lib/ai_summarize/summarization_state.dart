@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:infinity_notes/services/cloud/cloud_note.dart';
+import 'package:infinitynotes/services/cloud/cloud_note.dart';
 
 abstract class SummarizationState extends Equatable {}
 

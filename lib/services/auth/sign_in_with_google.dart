@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:infinity_notes/services/platform/platform_utils.dart' show PlatformUtils;
+import 'package:infinitynotes/services/platform/platform_utils.dart' show PlatformUtils;
 
 Future<UserCredential> signInWithGoogle() async {
   // Web implementation remains the same

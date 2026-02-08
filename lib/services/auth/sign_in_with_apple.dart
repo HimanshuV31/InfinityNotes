@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:infinity_notes/services/auth/auth_exception.dart';
+import 'package:infinitynotes/services/auth/auth_exception.dart';
 
 
 /// Apple Sign-In Implementation

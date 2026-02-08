@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinity_notes/services/cloud/cloud_note.dart';
-import 'package:infinity_notes/services/cloud/firebase_cloud_storage.dart';
-import 'package:infinity_notes/services/search/bloc/search_bloc.dart';
-import 'package:infinity_notes/services/search/bloc/search_event.dart';
-import 'package:infinity_notes/services/search/bloc/search_state.dart';
-import 'package:infinity_notes/utilities/ai/ai_helper.dart';
-import 'package:infinity_notes/utilities/generics/ui/custom_toast.dart';
-import 'package:infinity_notes/utilities/generics/ui/dialogs.dart';
-import 'package:infinity_notes/utilities/generics/ui/share_note_dialog.dart';
+import 'package:infinitynotes/services/cloud/cloud_note.dart';
+import 'package:infinitynotes/services/cloud/firebase_cloud_storage.dart';
+import 'package:infinitynotes/services/search/bloc/search_bloc.dart';
+import 'package:infinitynotes/services/search/bloc/search_event.dart';
+import 'package:infinitynotes/services/search/bloc/search_state.dart';
+import 'package:infinitynotes/utilities/ai/ai_helper.dart';
+import 'package:infinitynotes/utilities/generics/ui/custom_toast.dart';
+import 'package:infinitynotes/utilities/generics/ui/dialogs.dart';
+import 'package:infinitynotes/utilities/generics/ui/share_note_dialog.dart';
 
 Future<String?> showNoteActionsDialog({
   required BuildContext context,

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinity_notes/services/search/bloc/search_bloc.dart';
-import 'package:infinity_notes/services/search/bloc/search_event.dart';
-import 'package:infinity_notes/utilities/generics/ui/ui_constants.dart';
+import 'package:infinitynotes/services/search/bloc/search_bloc.dart';
+import 'package:infinitynotes/services/search/bloc/search_event.dart';
+import 'package:infinitynotes/utilities/generics/ui/ui_constants.dart';
 
 class SearchBar extends StatefulWidget {
   final bool isExpanded;

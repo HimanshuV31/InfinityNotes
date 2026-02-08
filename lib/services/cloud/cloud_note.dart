@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:infinity_notes/services/cloud/cloud_storage_constants.dart';
+import 'package:infinitynotes/services/cloud/cloud_storage_constants.dart';
 
 class CloudNote {
   final String documentId;

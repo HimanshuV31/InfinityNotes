@@ -1,13 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart'
     show FirebaseAuthException, FirebaseAuth, OAuthProvider, GoogleAuthProvider;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:infinity_notes/services/auth/auth_exception.dart';
-import 'package:infinity_notes/services/auth/i_auth_service.dart';
+import 'package:infinitynotes/services/auth/auth_exception.dart';
+import 'package:infinitynotes/services/auth/i_auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:infinity_notes/services/auth/auth_user.dart';
-import 'package:infinity_notes/services/auth/sign_in_with_apple.dart';
+import 'package:infinitynotes/services/auth/auth_user.dart';
+import 'package:infinitynotes/services/auth/sign_in_with_apple.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:infinity_notes/services/platform/platform_utils.dart';
+import 'package:infinitynotes/services/platform/platform_utils.dart';
 
 class FirebaseAuthProvider implements IAuthService {
   // Store injected dependencies as final fields

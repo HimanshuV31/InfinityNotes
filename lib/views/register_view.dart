@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinity_notes/helpers/loading/loading_screen.dart';
-import 'package:infinity_notes/services/auth/auth_exception.dart';
-import 'package:infinity_notes/services/auth/bloc/auth_bloc.dart';
-import 'package:infinity_notes/services/auth/bloc/auth_event.dart';
-import 'package:infinity_notes/services/auth/bloc/auth_state.dart';
-import 'package:infinity_notes/utilities/generics/ui/custom_app_bar.dart';
-import 'package:infinity_notes/utilities/generics/ui/dialogs.dart';
+import 'package:infinitynotes/helpers/loading/loading_screen.dart';
+import 'package:infinitynotes/services/auth/auth_exception.dart';
+import 'package:infinitynotes/services/auth/bloc/auth_bloc.dart';
+import 'package:infinitynotes/services/auth/bloc/auth_event.dart';
+import 'package:infinitynotes/services/auth/bloc/auth_state.dart';
+import 'package:infinitynotes/utilities/generics/ui/custom_app_bar.dart';
+import 'package:infinitynotes/utilities/generics/ui/dialogs.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});

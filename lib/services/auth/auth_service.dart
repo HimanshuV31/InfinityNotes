@@ -1,6 +1,6 @@
-import 'package:infinity_notes/services/auth/auth_user.dart';
-import 'package:infinity_notes/services/auth/i_auth_service.dart';
-import 'package:infinity_notes/core/dependency_injection/service_locator.dart';
+import 'package:infinitynotes/services/auth/auth_user.dart';
+import 'package:infinitynotes/services/auth/i_auth_service.dart';
+import 'package:infinitynotes/core/dependency_injection/service_locator.dart';
 
 class AuthService implements IAuthService {
   final IAuthService provider;

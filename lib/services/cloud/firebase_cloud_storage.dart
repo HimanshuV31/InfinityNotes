@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:infinity_notes/services/cloud/cloud_note.dart';
-import 'package:infinity_notes/services/cloud/cloud_storage_constants.dart';
-import 'package:infinity_notes/services/cloud/cloud_storage_exceptions.dart';
+import 'package:infinitynotes/services/cloud/cloud_note.dart';
+import 'package:infinitynotes/services/cloud/cloud_storage_constants.dart';
+import 'package:infinitynotes/services/cloud/cloud_storage_exceptions.dart';
 
 class FirebaseCloudStorage {
   // Constants and Declarations

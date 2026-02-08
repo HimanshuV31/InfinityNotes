@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:infinity_notes/services/feedback/emailjs_feedback_service.dart';
-import 'package:infinity_notes/utilities/generics/ui/custom_toast.dart';
+import 'package:infinitynotes/services/feedback/emailjs_feedback_service.dart';
+import 'package:infinitynotes/utilities/generics/ui/custom_toast.dart';
 
 enum FeedbackType {
   bugReport,

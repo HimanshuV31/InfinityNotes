@@ -1,6 +1,6 @@
-import 'package:infinity_notes/ai_summarize/ai_service.dart';
-import 'package:infinity_notes/services/cloud/cloud_note.dart';
-import 'package:infinity_notes/services/cloud/firebase_cloud_storage.dart';
+import 'package:infinitynotes/ai_summarize/ai_service.dart';
+import 'package:infinitynotes/services/cloud/cloud_note.dart';
+import 'package:infinitynotes/services/cloud/firebase_cloud_storage.dart';
 
 class AISummaryService {
   static final AISummaryService _instance = AISummaryService._internal();

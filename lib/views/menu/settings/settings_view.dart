@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:infinity_notes/services/theme/theme_notifier.dart';
-import 'package:infinity_notes/services/platform/app_version.dart';
-import 'package:infinity_notes/utilities/generics/ui/feedback_dialog.dart';
+import 'package:infinitynotes/services/theme/theme_notifier.dart';
+import 'package:infinitynotes/services/platform/app_version.dart';
+import 'package:infinitynotes/utilities/generics/ui/feedback_dialog.dart';
 
 class SettingsView extends StatelessWidget {
   final String userEmail;

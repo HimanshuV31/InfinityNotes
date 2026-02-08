@@ -1,4 +1,4 @@
-import "package:infinity_notes/constants/error_messages.dart";
+import "package:infinitynotes/constants/error_messages.dart";
 
 abstract class AuthException implements Exception {
   final String code;

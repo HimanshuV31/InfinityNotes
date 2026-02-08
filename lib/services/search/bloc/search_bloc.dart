@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinity_notes/services/cloud/cloud_note.dart';
-import 'package:infinity_notes/services/search/bloc/search_event.dart';
-import 'package:infinity_notes/services/search/bloc/search_state.dart';
-import 'package:infinity_notes/services/search/search_service.dart';
+import 'package:infinitynotes/services/cloud/cloud_note.dart';
+import 'package:infinitynotes/services/search/bloc/search_event.dart';
+import 'package:infinitynotes/services/search/bloc/search_state.dart';
+import 'package:infinitynotes/services/search/search_service.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   Iterable<CloudNote> _allNotes = [];

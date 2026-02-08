@@ -1,6 +1,6 @@
 {
-    "name": "infinity_notes",
-    "short_name": "infinity_notes",
+    "name": "infinitynotes",
+    "short_name": "infinitynotes",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

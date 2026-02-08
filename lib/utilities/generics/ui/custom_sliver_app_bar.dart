@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:infinity_notes/services/auth/auth_service.dart';
-import 'package:infinity_notes/utilities/generics/ui/animation/animation_controller.dart';
-import 'package:infinity_notes/utilities/generics/ui/ui_constants.dart';
-import 'package:infinity_notes/views/menu/menu_view.dart';
+import 'package:infinitynotes/services/auth/auth_service.dart';
+import 'package:infinitynotes/utilities/generics/ui/animation/animation_controller.dart';
+import 'package:infinitynotes/utilities/generics/ui/ui_constants.dart';
+import 'package:infinitynotes/views/menu/menu_view.dart';
 import 'search_bar.dart' as custom;
 
 class CustomSliverAppBar extends StatefulWidget {

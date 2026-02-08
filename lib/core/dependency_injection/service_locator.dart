@@ -12,13 +12,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'; // For debugPrint
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // For .env loading
 import 'package:get_it/get_it.dart';
-import 'package:infinity_notes/ai_summarize/ai_service.dart';
-import 'package:infinity_notes/constants/api_keys.dart';
-import 'package:infinity_notes/services/auth/firebase_auth_provider.dart';
-import 'package:infinity_notes/services/auth/bloc/auth_bloc.dart';
-import 'package:infinity_notes/services/feedback/emailjs_feedback_service.dart';
-import 'package:infinity_notes/services/theme/theme_notifier.dart';
-import 'package:infinity_notes/services/auth/i_auth_service.dart';
+import 'package:infinitynotes/ai_summarize/ai_service.dart';
+import 'package:infinitynotes/constants/api_keys.dart';
+import 'package:infinitynotes/services/auth/firebase_auth_provider.dart';
+import 'package:infinitynotes/services/auth/bloc/auth_bloc.dart';
+import 'package:infinitynotes/services/feedback/emailjs_feedback_service.dart';
+import 'package:infinitynotes/services/theme/theme_notifier.dart';
+import 'package:infinitynotes/services/auth/i_auth_service.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
 // GLOBAL SERVICE LOCATOR INSTANCE

@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:infinity_notes/services/auth/auth_exception.dart';
-import 'package:infinity_notes/services/auth/bloc/auth_event.dart';
-import 'package:infinity_notes/services/auth/bloc/auth_state.dart';
-import 'package:infinity_notes/services/auth/i_auth_service.dart';
+import 'package:infinitynotes/services/auth/auth_exception.dart';
+import 'package:infinitynotes/services/auth/bloc/auth_event.dart';
+import 'package:infinitynotes/services/auth/bloc/auth_state.dart';
+import 'package:infinitynotes/services/auth/i_auth_service.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(IAuthService authService) : super(const AuthStateUninitialized(isLoading: true)) {
     //Initialize

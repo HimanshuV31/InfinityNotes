@@ -60,11 +60,14 @@
 
         </activity>
 
-        <!-- Duplicate meta-data removed (already above) -->
     </application>
 
     <!-- Permission queries for sharing and deep linking -->
     <queries>
+        <package android:name="com.google.android.gms" />
+        <intent>
+            <action android:name="com.google.android.gms.auth.api.signin.SERVICE_CONFIG_UPDATED" />
+        </intent>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>

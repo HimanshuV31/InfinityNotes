@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:infinity_notes/services/platform/version_tracker.dart';
-import 'package:infinity_notes/services/platform/app_version.dart';
-
-// DIALOG LOGIC - Handles showing/dismissing
+import 'package:infinitynotes/services/platform/version_tracker.dart';
+import 'package:infinitynotes/services/platform/app_version.dart';
+import 'package:infinitynotes/services/platform/changelog_parser.dart';
 
 /// Show "What's New" dialog if version changed
 Future<void> showWhatsNewIfNeeded(BuildContext context) async {
   final shouldShow = await VersionTracker.shouldShowWhatsNew();
 
   if (shouldShow && context.mounted) {
-    // Small delay so user sees main screen first
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (context.mounted) {
@@ -21,8 +19,6 @@ Future<void> showWhatsNewIfNeeded(BuildContext context) async {
     }
   }
 }
-
-// DIALOG WIDGET - Wrapper with styling
 
 class WhatsNewDialog extends StatelessWidget {
   const WhatsNewDialog({super.key});
@@ -38,13 +34,85 @@ class WhatsNewDialog extends StatelessWidget {
   }
 }
 
-// CONTENT LOGIC - What's displayed inside
-
-class WhatsNewContent extends StatelessWidget {
+class WhatsNewContent extends StatefulWidget {
   const WhatsNewContent({super.key});
 
   @override
+  State<WhatsNewContent> createState() => _WhatsNewContentState();
+}
+
+class _WhatsNewContentState extends State<WhatsNewContent> {
+  VersionChangelog? _changelog;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChangelog();
+  }
+
+  Future<void> _loadChangelog() async {
+    try {
+      // Strip 'v' prefix if present
+      final versionToLookup = AppVersion.version.startsWith('v')
+          ? AppVersion.version.substring(1)
+          : AppVersion.version;
+
+      final changelog = await ChangelogParser.getVersionChangelog(
+        versionToLookup,
+      );
+
+      if (mounted) {
+        setState(() {
+          _changelog = changelog;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = 'Failed to load changelog';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_error != null || _changelog == null) {
+      return Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: Theme.of(context).colorScheme.error,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _error ?? 'No changelog available',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 24),
+            _buildActionButton(context),
+          ],
+        ),
+      );
+    }
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -63,8 +131,6 @@ class WhatsNewContent extends StatelessWidget {
     );
   }
 
-  // CONTENT SECTIONS
-
   Widget _buildHeader(BuildContext context) {
     return Row(
       children: [
@@ -76,7 +142,7 @@ class WhatsNewContent extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            "What's New in ${AppVersion.version}",
+            "What's New in ${_changelog!.version}",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -89,51 +155,17 @@ class WhatsNewContent extends StatelessWidget {
   }
 
   List<Widget> _buildFeatureList(BuildContext context) {
-    final features = [
-      _FeatureData(
-        icon: Icons.bug_report_sharp,
-        title: 'Bug Fixes',
-        description: 'Fixed some bugs and improvements',
-      ),
-      _FeatureData(
-        icon: Icons.palette,
-        title: 'Dark & Light Themes',
-        description: 'Switch between themes in Settings',
-      ),
-      _FeatureData(
-        icon: Icons.settings,
-        title: 'New Settings Screen',
-        description: 'All app settings in one place',
-      ),
-      _FeatureData(
-        icon: Icons.bug_report,
-        title: 'Bug Reporting',
-        description: 'Report issues from Settings',
-      ),
-      _FeatureData(
-        icon: Icons.speed,
-        title: 'Performance',
-        description: 'Faster and smoother',
-      ),
-      _FeatureData(
-        icon: Icons.animation,
-        title: 'Animation',
-        description: 'Smoother Animations',
-      ),
-    ];
-
-    return features
+    return _changelog!.features
         .map((feature) => _buildFeatureItem(context, feature))
         .toList();
   }
 
-  Widget _buildFeatureItem(BuildContext context, _FeatureData data) {
+  Widget _buildFeatureItem(BuildContext context, ChangelogFeature feature) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Icon container
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -141,33 +173,34 @@ class WhatsNewContent extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
-              data.icon,
+              feature.icon,
               color: Theme.of(context).colorScheme.primary,
               size: 20,
             ),
           ),
           const SizedBox(width: 12),
-          // Text content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data.title,
+                  feature.title,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  data.description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).textTheme.bodySmall?.color,
+                if (feature.description.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    feature.description,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -204,18 +237,4 @@ class WhatsNewContent extends StatelessWidget {
       ),
     );
   }
-}
-
-// DATA MODEL - Feature information
-
-class _FeatureData {
-  final IconData icon;
-  final String title;
-  final String description;
-
-  const _FeatureData({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
 }

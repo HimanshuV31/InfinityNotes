@@ -1,8 +1,8 @@
-name: infinity_notes
+name: infinitynotes
 description: "Infinity Notes app."
 publish_to: 'none'
 
-version: 1.0.6+8
+version: 1.0.7+9
 
 environment:
   sdk: ^3.8.1
@@ -35,7 +35,7 @@ dependencies:
   http: ^1.2.0
   flutter_secure_storage: ^10.0.0
   package_info_plus: ^9.0.0  # Get app version info
-  device_info_plus: ^12.3.0
+#  device_info_plus: ^12.3.0
   emailjs: ^4.0.0
   provider: ^6.1.1
   cached_network_image: ^3.3.0
@@ -43,6 +43,7 @@ dependencies:
   connectivity_plus: ^7.0.0
   get_it: ^9.2.0
   flutter_dotenv: ^6.0.0
+  flutter_markdown: ^0.7.4
 
 dev_dependencies:
   flutter_test:
@@ -60,15 +61,17 @@ flutter:
     - .env
     - assets/icons/
     - assets/images/
-
+    - assets/changelogs/
 # ---- Splash screen ----
 flutter_native_splash:
   color: "#3993ad"
   image: assets/icons/Infinity_Notes_Splash.png
   android: true
-  ios: true
+  ios: false #temporary measure. Make it true when running the splash in iOS
   android_gravity: center
-
+  android_12:
+    image: assets/icons/Infinity_Notes_Splash.png
+    icon_background_color: "#3993ad"
 
 # ---- App icons ----
 flutter_launcher_icons:

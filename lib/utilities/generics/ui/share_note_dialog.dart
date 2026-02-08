@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:infinity_notes/services/cloud/cloud_note.dart';
+import 'package:infinitynotes/services/cloud/cloud_note.dart';
 
 Future<void> showShareNoteDialog({
   required BuildContext context,

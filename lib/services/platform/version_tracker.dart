@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:infinity_notes/services/platform/app_version.dart';
+import 'package:infinitynotes/services/platform/app_version.dart';
 
 class VersionTracker {
   static const String _keyLastSeenVersion = 'last_seen_version';

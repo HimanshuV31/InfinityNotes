@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.ehv" "\0"
-            VALUE "FileDescription", "infinity_notes" "\0"
+            VALUE "FileDescription", "infinitynotes" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "infinity_notes" "\0"
+            VALUE "InternalName", "infinitynotes" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.ehv. All rights reserved." "\0"
-            VALUE "OriginalFilename", "infinity_notes.exe" "\0"
-            VALUE "ProductName", "infinity_notes" "\0"
+            VALUE "OriginalFilename", "infinitynotes.exe" "\0"
+            VALUE "ProductName", "infinitynotes" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:device_info_plus/device_info_plus.dart';
+// import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:infinity_notes/services/platform/platform_utils.dart';
+import 'package:infinitynotes/services/platform/platform_utils.dart';
 
 enum EmailJSFeedbackType {
   bugReport,
@@ -17,7 +17,9 @@ class EmailJSFeedbackService {
   static const String supportEmail = 'himanshuv31.dev@gmail.com';
   static const String apiEndpoint = 'https://api.emailjs.com/api/v1.0/email/send';
 
-  /// Initialize EmailJS - not needed for HTTP approach
+  // Now that device_info_plus is stable again, turn this on
+  static const bool _useDeviceInfo = false;
+
   static void init() {
     debugPrint('EmailJS service initialized (HTTP mode)');
   }
@@ -31,20 +33,17 @@ class EmailJSFeedbackService {
     try {
       debugPrint('📤 Sending feedback via EmailJS API...');
 
-      // Gather device info for bug reports
       final deviceInfo = type == EmailJSFeedbackType.bugReport
           ? await _getDeviceInfo()
           : 'N/A (General Feedback)';
       final appInfo = await _getAppInfo();
       final timestamp = DateTime.now().toIso8601String();
 
-      // Define colors based on feedback type
       final bool isBugReport = type == EmailJSFeedbackType.bugReport;
-      final String headerColor = isBugReport ? '#dc3545' : '#3993ad';        // Red for bugs, Blue for feedback
-      final String headerColorDark = isBugReport ? '#c82333' : '#2980b9';   // Darker shade for gradient
-      final String accentColor = isBugReport ? '#dc3545' : '#3993ad';       // Accent color for labels
+      final String headerColor = isBugReport ? '#dc3545' : '#3993ad';
+      final String headerColorDark = isBugReport ? '#c82333' : '#2980b9';
+      final String accentColor = isBugReport ? '#dc3545' : '#3993ad';
 
-      // Build request body with color variables
       final requestBody = {
         'service_id': serviceId,
         'template_id': templateId,
@@ -64,9 +63,6 @@ class EmailJSFeedbackService {
         },
       };
 
-      debugPrint('📧 Request body: ${json.encode(requestBody)}');
-
-      // Send POST request to EmailJS API
       final response = await http.post(
         Uri.parse(apiEndpoint),
         headers: {
@@ -78,22 +74,25 @@ class EmailJSFeedbackService {
 
       debugPrint('📬 EmailJS Response: ${response.statusCode} - ${response.body}');
 
-      if (response.statusCode == 200) {
-        debugPrint('Feedback email sent successfully!');
-        return true;
-      } else {
-        debugPrint('EmailJS Error: ${response.statusCode} - ${response.body}');
-        return false;
-      }
-
+      return response.statusCode == 200;
     } catch (error) {
       debugPrint('❌ Error sending feedback: $error');
       return false;
     }
   }
 
-  // Helper: Get device information
   static Future<String> _getDeviceInfo() async {
+    // TEMP: device_info_plus disabled due to AGP compatibility
+    return 'Platform: ${kIsWeb ? 'Web' : (PlatformUtils.isAndroid ? 'Android' : (PlatformUtils.isIOS ? 'iOS' : 'Desktop'))}\n'
+        'Device: Information temporarily unavailable\n'
+        'Note: Full device details will be available in future updates';
+    /* //The Original Implementation
+    if (!_useDeviceInfo) {
+      return 'Platform: ${kIsWeb ? 'Web' : (PlatformUtils.isAndroid ? 'Android' : (PlatformUtils.isIOS ? 'iOS' : 'Desktop'))}\n'
+          'Device: Information temporarily unavailable\n'
+          'Note: Full device details will be available in future updates';
+    }
+
     if (kIsWeb) return 'Platform: Web Browser';
 
     final deviceInfo = DeviceInfoPlugin();
@@ -110,10 +109,14 @@ class EmailJSFeedbackService {
           'Name: ${iosInfo.name}';
     }
 
-    return 'Platform: Desktop';
+    return {
+    'Platform: Desktop',
+    'Device: Unknown'
+    };
+
+     */
   }
 
-  // Helper: Get app information
   static Future<String> _getAppInfo() async {
     final packageInfo = await PackageInfo.fromPlatform();
     return 'App Version: ${packageInfo.version} (Build ${packageInfo.buildNumber})\n'

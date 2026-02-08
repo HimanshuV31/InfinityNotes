@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:infinity_notes/services/platform/app_version.dart';
-import 'package:infinity_notes/utilities/generics/ui/dialogs.dart';
+import 'package:infinitynotes/services/platform/app_version.dart';
+import 'package:infinitynotes/utilities/generics/ui/dialogs.dart';
 
 class MenuView extends StatelessWidget {
   final String userEmail;

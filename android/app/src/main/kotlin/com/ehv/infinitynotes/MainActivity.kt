@@ -1,4 +1,4 @@
-package com.example.infinity_notes
+package com.ehv.infinitynotes
 
 import io.flutter.embedding.android.FlutterActivity
 

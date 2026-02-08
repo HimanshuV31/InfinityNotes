@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:infinity_notes/ai_summarize/ai_service.dart';
-import 'package:infinity_notes/ai_summarize/ai_summary_service.dart';
-import 'package:infinity_notes/services/auth/auth_service.dart';
-import 'package:infinity_notes/utilities/generics/ui/custom_toast.dart';
+import 'package:infinitynotes/ai_summarize/ai_service.dart';
+import 'package:infinitynotes/ai_summarize/ai_summary_service.dart';
+import 'package:infinitynotes/services/auth/auth_service.dart';
+import 'package:infinitynotes/utilities/generics/ui/custom_toast.dart';
 
 //  Reusable UI Component with Clean Interface
 class AISummaryDialog extends StatefulWidget {

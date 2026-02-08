@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:infinity_notes/ai_summarize/ai_service.dart';
-import 'package:infinity_notes/ai_summarize/ai_summary_service.dart';
-import 'package:infinity_notes/utilities/ai/ai_summary_dialog.dart';
+import 'package:infinitynotes/ai_summarize/ai_service.dart';
+import 'package:infinitynotes/ai_summarize/ai_summary_service.dart';
+import 'package:infinitynotes/utilities/ai/ai_summary_dialog.dart';
 
 //  Clean utility functions with no business logic
 class AIHelper {
