@@ -225,7 +225,7 @@ class _ProfileViewState extends State<ProfileView> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _gender,
+                initialValue: _gender,
                 decoration: const InputDecoration(
                   labelText: 'Gender',
                   border: OutlineInputBorder(),
@@ -248,8 +248,8 @@ class _ProfileViewState extends State<ProfileView> {
                     child: Text('Prefer not to say'),
                   ),
                 ],
-                onChanged: (value) {
-                  setState(() => _gender = value);
+                onChanged: (initialValue) {
+                  setState(() => _gender = initialValue);
                 },
               ),
               const SizedBox(height: 24),
@@ -303,7 +303,7 @@ class _ProfileAvatar extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 40,
-            backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+            backgroundColor: theme.colorScheme.primary.withAlpha(26),
             backgroundImage: (photoUrl != null && photoUrl!.isNotEmpty)
                 ? NetworkImage(photoUrl!)
                 : null,
