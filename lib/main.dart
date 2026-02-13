@@ -1,10 +1,13 @@
 import 'dart:async';
+
 import 'package:app_links/app_links.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+
 import 'package:infinitynotes/constants/routes.dart';
 import 'package:infinitynotes/core/dependency_injection/service_locator.dart';
 import 'package:infinitynotes/helpers/loading/loading_screen.dart';
@@ -12,6 +15,7 @@ import 'package:infinitynotes/services/auth/bloc/auth_bloc.dart';
 import 'package:infinitynotes/services/auth/bloc/auth_event.dart';
 import 'package:infinitynotes/services/auth/bloc/auth_state.dart';
 import 'package:infinitynotes/services/platform/app_version.dart';
+import 'package:infinitynotes/services/profile/profile_cubit.dart';
 import 'package:infinitynotes/services/theme/theme_notifier.dart';
 import 'package:infinitynotes/utilities/generics/ui/dialogs.dart';
 import 'package:infinitynotes/views/login_view.dart';
@@ -19,7 +23,6 @@ import 'package:infinitynotes/views/notes/create_update_note_view.dart';
 import 'package:infinitynotes/views/notes/notes_view.dart';
 import 'package:infinitynotes/views/register_view.dart';
 import 'package:infinitynotes/views/verify_email_view.dart';
-import 'package:provider/provider.dart';
 
 // ============================================================================
 // GLOBAL DEEP LINK MANAGEMENT
@@ -32,10 +35,7 @@ StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 // MAIN ENTRY POINT
 // ============================================================================
 Future<void> main() async {
-  // Ensure Flutter bindings are initialized before async operations
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Wrap initialization in error handler for production safety
   await _initializeApp();
 
   runApp(
@@ -54,35 +54,28 @@ Future<void> main() async {
 // ============================================================================
 Future<void> _initializeApp() async {
   try {
-    // 1️⃣ Firebase Core (required first)
     await Firebase.initializeApp();
     debugPrint('✅ Firebase initialized');
 
-    // 2️⃣ Firestore Configuration
     await _configureFirestore();
     debugPrint('✅ Firestore configured');
 
-    // 3️⃣ Network Connectivity Monitoring
     _setupConnectivityListener();
     debugPrint('✅ Connectivity listener active');
 
-    // 4️⃣ Dependency Injection (GetIt)
     await setupServiceLocator();
     debugPrint('✅ Service locator configured');
 
-    // 5️⃣ Deep Linking Setup
     await _initializeDeepLinking();
     debugPrint('✅ Deep linking initialized');
 
-    // 6️⃣ App Version Management
     await AppVersion.init();
     debugPrint('✅ App version loaded: ${AppVersion.version}');
-
   } catch (e, stackTrace) {
     debugPrint('❌ FATAL: App initialization failed');
     debugPrint('Error: $e');
     debugPrint('Stack: $stackTrace');
-    rethrow; // Re-throw to prevent app launch with corrupted state
+    rethrow;
   }
 }
 
@@ -100,24 +93,22 @@ Future<void> _configureFirestore() async {
 // NETWORK CONNECTIVITY MONITORING
 // ============================================================================
 void _setupConnectivityListener() {
-  _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
-        (List<ConnectivityResult> results) { // ✅ FIXED: Now accepts List
-      // Check if any connection type is available (not none)
-      final hasConnection = results.any((result) => result != ConnectivityResult.none);
+  _connectivitySubscription =
+      Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+        final hasConnection =
+        results.any((result) => result != ConnectivityResult.none);
 
-      if (hasConnection) {
-        debugPrint('🌐 Network restored: $results');
-        FirebaseFirestore.instance.enableNetwork().catchError((e) {
-          debugPrint('⚠️ Failed to reconnect Firestore: $e');
-        });
-      } else {
-        debugPrint('🚫 Network disconnected');
-      }
-    },
-    onError: (error) {
-      debugPrint('⚠️ Connectivity listener error: $error');
-    },
-  );
+        if (hasConnection) {
+          debugPrint('🌐 Network restored: $results');
+          FirebaseFirestore.instance.enableNetwork().catchError((e) {
+            debugPrint('⚠️ Failed to reconnect Firestore: $e');
+          });
+        } else {
+          debugPrint('🚫 Network disconnected');
+        }
+      }, onError: (error) {
+        debugPrint('⚠️ Connectivity listener error: $error');
+      });
 }
 
 // ============================================================================
@@ -167,7 +158,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       debugPrint('🔄 App resumed - checking network state');
-      Connectivity().checkConnectivity().then((results) { // ✅ FIXED: returns List
+      Connectivity().checkConnectivity().then((results) {
         final hasConnection = results.any((r) => r != ConnectivityResult.none);
         if (hasConnection) {
           FirebaseFirestore.instance.enableNetwork();
@@ -177,18 +168,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   void _setupDeepLinkListener() {
-    _linkSubscription = _appLinks.uriLinkStream.listen(
-          (Uri uri) {
-        if (uri.host == 'note' && uri.pathSegments.isNotEmpty) {
-          _pendingDeepLink = uri.toString();
-          debugPrint('📎 Deep link received: $_pendingDeepLink');
-          _processPendingDeepLink();
-        }
-      },
-      onError: (error) {
-        debugPrint('⚠️ Deep link stream error: $error');
-      },
-    );
+    _linkSubscription = _appLinks.uriLinkStream.listen((Uri uri) {
+      if (uri.host == 'note' && uri.pathSegments.isNotEmpty) {
+        _pendingDeepLink = uri.toString();
+        debugPrint('📎 Deep link received: $_pendingDeepLink');
+        _processPendingDeepLink();
+      }
+    }, onError: (error) {
+      debugPrint('⚠️ Deep link stream error: $error');
+    });
   }
 
   void _processPendingDeepLink() {
@@ -214,7 +202,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           themeMode: notifier.themeMode,
           home: Builder(
             builder: (context) {
-              // Initialize Auth state on first build
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 if (!mounted) return;
 
@@ -224,7 +211,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                   authBloc.add(const AuthEventInitialize());
                 }
 
-                // Process pending deep link
                 if (_pendingDeepLink != null) {
                   handleDeepLink(context, Uri.parse(_pendingDeepLink!));
                   _pendingDeepLink = null;
@@ -237,14 +223,33 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           routes: {
             CreateUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
           },
+          // CRITICAL: Wrap ALL routes with ProfileCubit when logged in
           builder: (context, child) {
-            // Force consistent text scaling across devices
-            return MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                boldText: false,
-                textScaler: const TextScaler.linear(1.0),
-              ),
-              child: child!,
+            return BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, authState) {
+                // Only provide ProfileCubit when user is logged in
+                if (authState is AuthStateLoggedIn) {
+                  return BlocProvider(
+                    create: (_) => ProfileCubit()..loadOrCreateProfile(),
+                    child: MediaQuery(
+                      data: MediaQuery.of(context).copyWith(
+                        boldText: false,
+                        textScaler: const TextScaler.linear(1.0),
+                      ),
+                      child: child!,
+                    ),
+                  );
+                }
+
+                // For non-logged-in states, no ProfileCubit needed
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    boldText: false,
+                    textScaler: const TextScaler.linear(1.0),
+                  ),
+                  child: child!,
+                );
+              },
             );
           },
         );
@@ -263,7 +268,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) async {
-        // Handle loading state
         if (state.isLoading) {
           LoadingScreen().show(
             context: context,
@@ -273,7 +277,6 @@ class HomePage extends StatelessWidget {
           LoadingScreen().hide();
         }
 
-        // Handle email verification prompt
         if (state is AuthStateNeedsEmailVerification) {
           final shouldVerify = await showWarningDialog(
             context: context,
@@ -286,7 +289,6 @@ class HomePage extends StatelessWidget {
           }
         }
 
-        // Handle logout navigation
         if (state is AuthStateLoggedOut && !state.isLoading && context.mounted) {
           Navigator.of(context).popUntil((route) => route.isFirst);
         }
@@ -294,7 +296,6 @@ class HomePage extends StatelessWidget {
       builder: (context, state) {
         debugPrint('🔍 Auth State: ${state.runtimeType}');
 
-        // Route to appropriate screen based on auth state
         return switch (state) {
           AuthStateLoggedIn() => const NotesView(),
           AuthStateNavigateToVerifyEmail() => const VerifyEmailView(),
@@ -320,14 +321,12 @@ void handleDeepLink(BuildContext context, Uri uri) {
 
   debugPrint('🔗 Processing deep link: $uri');
 
-  // Validate deep link format: infinitynotes://note/{noteId}
   if (uri.host == 'note' && uri.pathSegments.length == 1) {
     final String noteId = uri.pathSegments[0];
     final authBloc = context.read<AuthBloc>();
     final currentState = authBloc.state;
 
     if (currentState is AuthStateLoggedIn) {
-      // User is authenticated - navigate to note
       Navigator.of(context).pushNamed(
         CreateUpdateNoteRoute,
         arguments: {
@@ -337,7 +336,6 @@ void handleDeepLink(BuildContext context, Uri uri) {
       );
       debugPrint('✅ Navigated to note: $noteId');
     } else {
-      // User not authenticated - prompt login
       showCustomRoutingDialog(
         context: context,
         title: "Login Required",

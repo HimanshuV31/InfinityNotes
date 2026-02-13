@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:infinitynotes/services/theme/theme_notifier.dart';
 import 'package:infinitynotes/services/platform/app_version.dart';
 import 'package:infinitynotes/utilities/generics/ui/feedback_dialog.dart';
+import 'package:infinitynotes/utilities/navigation/about_developer_route.dart';
 
 class SettingsView extends StatelessWidget {
   final String userEmail;
@@ -39,6 +40,13 @@ class SettingsView extends StatelessWidget {
 
           // About Section
           _buildSectionHeader(context, 'About'),
+          _buildMenuItem(
+            icon: Icons.developer_mode,
+            title: 'About the Developer',
+            onTap: ()=>openAboutDeveloper(context),
+            // subtitle: AppVersion.version,
+            trailing: const SizedBox.shrink(),
+          ),
           _buildMenuItem(
             icon: Icons.info_outline,
             title: 'Version',

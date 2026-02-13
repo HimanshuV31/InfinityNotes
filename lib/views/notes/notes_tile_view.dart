@@ -20,7 +20,9 @@ class NotesTileView extends StatelessWidget {
     if (PlatformUtils.isWeb ||
         PlatformUtils.isWindows ||
         PlatformUtils.isMacOS ||
-        PlatformUtils.isLinux) return 4;
+        PlatformUtils.isLinux) {
+      return 4;
+    }
     return 2;
   }
 
@@ -61,7 +63,9 @@ class SliverNotesTileView extends StatelessWidget {
     if (PlatformUtils.isWeb ||
         PlatformUtils.isWindows ||
         PlatformUtils.isMacOS ||
-        PlatformUtils.isLinux) return 4;
+        PlatformUtils.isLinux) {
+      return 4;
+    }
     return 2;
   }
 

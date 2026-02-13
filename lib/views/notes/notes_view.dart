@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart'
     show ReadContext, BlocListener, BlocProvider, BlocBuilder;
+import 'package:infinitynotes/views/menu/profile/profile_view.dart';
 import 'package:infinitynotes/constants/routes.dart';
-import 'package:infinitynotes/enums/menu_actions.dart';
 import 'package:infinitynotes/services/auth/auth_exception.dart';
 import 'package:infinitynotes/services/auth/auth_service.dart';
 import 'package:infinitynotes/services/auth/bloc/auth_bloc.dart';
@@ -19,12 +19,11 @@ import 'package:infinitynotes/utilities/generics/ui/animation/animation_controll
 import 'package:infinitynotes/utilities/generics/ui/custom_sliver_app_bar.dart';
 import 'package:infinitynotes/utilities/generics/ui/custom_toast.dart';
 import 'package:infinitynotes/utilities/generics/ui/dialogs.dart';
-import 'package:infinitynotes/utilities/generics/ui/feedback_dialog.dart';
 import 'package:infinitynotes/utilities/generics/ui/ui_constants.dart';
+import 'package:infinitynotes/utilities/generics/ui/whats_new_dialog.dart';
 import 'package:infinitynotes/views/menu/settings/settings_view.dart';
 import 'package:infinitynotes/views/notes/notes_list_view.dart';
 import 'package:infinitynotes/views/notes/notes_tile_view.dart';
-import 'package:infinitynotes/utilities/generics/ui/whats_new_dialog.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -35,11 +34,12 @@ class NotesView extends StatefulWidget {
 
 class _NotesViewState extends State<NotesView> {
   String get userEmail => AuthService.firebase().currentUser!.email;
-  late final FirebaseCloudStorage _notesService;
   String get userId => AuthService.firebase().currentUser!.id;
-  CloseDialog? _closeDialogHandle;
-  late SearchBloc _searchBloc;
 
+  late final FirebaseCloudStorage _notesService;
+  late final SearchBloc _searchBloc;
+
+  CloseDialog? _closeDialogHandle;
   final ValueNotifier<bool> _showListViewNotifier = ValueNotifier<bool>(false);
 
   Future<void> newNote() async {
@@ -47,9 +47,10 @@ class _NotesViewState extends State<NotesView> {
   }
 
   Future<void> openNote(CloudNote note) async {
-    await Navigator.of(
-      context,
-    ).pushNamed(CreateUpdateNoteRoute, arguments: note);
+    await Navigator.of(context).pushNamed(
+      CreateUpdateNoteRoute,
+      arguments: note,
+    );
   }
 
   @override
@@ -57,6 +58,7 @@ class _NotesViewState extends State<NotesView> {
     super.initState();
     _notesService = FirebaseCloudStorage();
     _searchBloc = SearchBloc();
+
     GlobalAnimationController.triggerTitleAnimation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showWhatsNewIfNeeded(context);
@@ -74,6 +76,35 @@ class _NotesViewState extends State<NotesView> {
     super.dispose();
   }
 
+  Future<void> _handleLogout() async {
+    final shouldLogout = await showLogoutDialog(context: context);
+    if (!mounted) return;
+    if (!shouldLogout) return;
+
+    context.read<AuthBloc>().add(const AuthEventLogOut());
+    if (!mounted) return;
+
+    showCustomToast(context, 'Logout Successful');
+  }
+
+  Future<void> _handleSettings() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => SettingsView(
+          userEmail: userEmail,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleProfile() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ProfileView(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -88,10 +119,9 @@ class _NotesViewState extends State<NotesView> {
             } else if (state.isLoading && closeDialog == null) {
               _closeDialogHandle = showLoadingDialog(
                 context: context,
-                text: "Loading... .. .",
+                text: 'Loading... .. .',
               );
             }
-
             final e = state.exception;
             if (e is AuthException) {
               showWarningDialog(
@@ -117,23 +147,26 @@ class _NotesViewState extends State<NotesView> {
                     ),
                   );
                 }
+
                 if (snapshot.hasError) {
                   return Center(
                     child: Text(
-                      "Error: ${snapshot.error}",
+                      'Error: ${snapshot.error}',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   );
                 }
+
                 final allNotes = snapshot.data ?? <CloudNote>[];
                 final hasNotes = allNotes.isNotEmpty;
+
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (hasNotes && _searchBloc.state is SearchInitial) {
                     _searchBloc.add(SearchInitiated(allNotes));
                     debugPrint(
-                      "🔍 Post-frame: Initialized SearchBloc with ${allNotes.length} notes",
+                      '🔍 Post-frame: Initialized SearchBloc with ${allNotes.length} notes',
                     );
                   }
                 });
@@ -145,7 +178,7 @@ class _NotesViewState extends State<NotesView> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
                         CustomSliverAppBar(
-                          title: "Infinity Notes",
+                          title: 'Infinity Notes',
                           userEmail: userEmail,
                           hasNotes: hasNotes,
                           autoShowSearch: hasNotes,
@@ -155,12 +188,12 @@ class _NotesViewState extends State<NotesView> {
                           Theme.of(context).appBarTheme.foregroundColor!,
                           onToggleView: _toggleView,
                           isListView: showListView,
-                          onLogout: () => _handleMenuAction(MenuAction.logout),
-                          onSearchChanged: (query) =>
-                              _searchBloc.add(SearchQueryChanged(query)),
-                          onReportBug: _handleReportBug,
-                          onFeedback: _handleFeedback,
+                          onSearchChanged: (query) {
+                            _searchBloc.add(SearchQueryChanged(query));
+                          },
                           onSettings: _handleSettings,
+                          onLogout: _handleLogout,
+                          onProfile: _handleProfile,
                         ),
                         BlocBuilder<SearchBloc, SearchState>(
                           builder: (context, searchState) {
@@ -207,65 +240,24 @@ class _NotesViewState extends State<NotesView> {
               ),
             ),
           ),
-
         ),
       ),
     );
   }
 
-  void _handleMenuAction(MenuAction action) async {
-    switch (action) {
-      case MenuAction.logout:
-        final shouldLogout = await showLogoutDialog(context: context);
-        if (!mounted) return;
-        if (!shouldLogout) return;
-        context.read<AuthBloc>().add(const AuthEventLogOut());
-        if (!mounted) return;
-        showCustomToast(context, "Logout Successful");
-        break;
-      case MenuAction.profile:
-        throw UnimplementedError();
-      case MenuAction.settings:
-        throw UnimplementedError();
-    }
-  }
-
-  Future<void> _handleReportBug() async {
-    await showFeedbackDialog(
-      context: context,
-      type: FeedbackType.bugReport,
-      userEmail: userEmail,
-    );
-  }
-
-  Future<void> _handleFeedback() async {
-    await showFeedbackDialog(
-      context: context,
-      type: FeedbackType.generalFeedback,
-      userEmail: userEmail,
-    );
-  }
-  Future<void> _handleSettings() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => SettingsView(
-          userEmail: userEmail,
-        ),
-      ),
-    );
-  }
   Widget _buildNotesContent(
       Iterable<CloudNote> allNotes,
       SearchState searchState,
       bool showListView,
-      ) {
-    debugPrint("🔍 _buildNotesContent: searchState = $searchState");
-    debugPrint("🔍 searchState type: ${searchState.runtimeType}");
+      )
+  {
+    debugPrint('🔍 _buildNotesContent: searchState = $searchState');
+    debugPrint('🔍 searchState type: ${searchState.runtimeType}');
 
     Iterable<CloudNote> notesToShow;
 
     if (searchState is SearchResults) {
-      debugPrint("🔍 ENTERING SearchResults branch");
+      debugPrint('🔍 ENTERING SearchResults branch');
 
       final state = searchState;
       final liveNoteIds = allNotes.map((n) => n.documentId).toSet();
@@ -274,7 +266,7 @@ class _NotesViewState extends State<NotesView> {
       );
 
       debugPrint(
-        "🔍 Showing ${notesToShow.length} search results for '${state.query}'",
+        '🔍 Showing ${notesToShow.length} search results for \'${state.query}\'',
       );
 
       if (notesToShow.isEmpty) {
@@ -290,7 +282,7 @@ class _NotesViewState extends State<NotesView> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "No results found for: ${state.query}",
+                  'No results found for: ${state.query}',
                   style: TextStyle(
                     color: Theme.of(context).textTheme.bodySmall?.color,
                     fontSize: 16,
@@ -302,10 +294,10 @@ class _NotesViewState extends State<NotesView> {
         );
       }
     } else if (searchState is SearchEmpty) {
-      debugPrint("🔍 ENTERING SearchEmpty branch");
+      debugPrint('🔍 ENTERING SearchEmpty branch');
 
       final state = searchState;
-      debugPrint("🔍 No results found for '${state.query}'");
+      debugPrint('🔍 No results found for \'${state.query}\'');
 
       return SliverFillRemaining(
         child: Center(
@@ -319,7 +311,7 @@ class _NotesViewState extends State<NotesView> {
               ),
               const SizedBox(height: 16),
               Text(
-                "No results found for: ${state.query}",
+                'No results found for: ${state.query}',
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodySmall?.color,
                   fontSize: 16,
@@ -330,22 +322,23 @@ class _NotesViewState extends State<NotesView> {
         ),
       );
     } else if (searchState is SearchInitial) {
-      debugPrint("🔍 ENTERING SearchInitial branch");
+      debugPrint('🔍 ENTERING SearchInitial branch');
 
       final state = searchState;
       notesToShow = state.notes.isNotEmpty ? state.notes : allNotes;
 
       debugPrint(
-        "🔍 Showing all ${notesToShow.length} notes (initial state)",
+        '🔍 Showing all ${notesToShow.length} notes (initial state)',
       );
     } else {
-      debugPrint("🔍 ENTERING default branch");
+      debugPrint('🔍 ENTERING default branch');
 
       notesToShow = allNotes;
-      debugPrint("🔍 Showing all ${notesToShow.length} notes (default)");
+      debugPrint(
+        '🔍 Showing all ${notesToShow.length} notes (default)',
+      );
     }
 
-    // Empty notes check
     if (notesToShow.isEmpty) {
       return SliverFillRemaining(
         child: Center(
@@ -359,7 +352,7 @@ class _NotesViewState extends State<NotesView> {
               ),
               const SizedBox(height: 16),
               Text(
-                "No notes found. Create one!",
+                'No notes found. Create one!',
                 style: TextStyle(
                   color: Theme.of(context).textTheme.bodySmall?.color,
                   fontSize: 16,
@@ -371,9 +364,10 @@ class _NotesViewState extends State<NotesView> {
       );
     }
 
-    // Render list or tile view
     if (showListView) {
-      debugPrint("🔍 Rendering ListView with ${notesToShow.length} notes");
+      debugPrint(
+        '🔍 Rendering ListView with ${notesToShow.length} notes',
+      );
 
       return SliverNotesListView(
         key: const ValueKey('list_view'),
@@ -386,7 +380,9 @@ class _NotesViewState extends State<NotesView> {
         ),
       );
     } else {
-      debugPrint("🔍 Rendering TileView with ${notesToShow.length} notes");
+      debugPrint(
+        '🔍 Rendering TileView with ${notesToShow.length} notes',
+      );
 
       return SliverNotesTileView(
         key: const ValueKey('tile_view'),

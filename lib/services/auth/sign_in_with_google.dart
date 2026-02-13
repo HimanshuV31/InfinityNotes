@@ -24,14 +24,7 @@ Future<UserCredential> signInWithGoogle() async {
 
     // Use authenticate() instead of signIn() for v7.2.0
     // This handles user interaction properly
-    final GoogleSignInAccount? account = await gsi.authenticate();
-
-    if (account == null) {
-      throw FirebaseAuthException(
-        code: 'canceled',
-        message: 'Sign-in aborted by user.',
-      );
-    }
+    final GoogleSignInAccount account = await gsi.authenticate();
 
     // Get authentication - synchronous in v7.2.0+
     final GoogleSignInAuthentication auth = account.authentication;

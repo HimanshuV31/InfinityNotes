@@ -132,9 +132,9 @@ class _LoginViewState extends State<LoginView> {
                             );
                             return;
                           }
-                          final bool _confirm =
+                          final bool confirm =
                           await showConfirmDialog(context: context);
-                          if (!_confirm) return;
+                          if (!confirm) return;
                           try {
                             if (!mounted) return;
                             context

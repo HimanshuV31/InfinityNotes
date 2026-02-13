@@ -6,7 +6,6 @@ import 'package:infinitynotes/services/auth/i_auth_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:infinitynotes/services/auth/auth_user.dart';
 import 'package:infinitynotes/services/auth/sign_in_with_apple.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:infinitynotes/services/platform/platform_utils.dart';
 
 class FirebaseAuthProvider implements IAuthService {
@@ -162,11 +161,6 @@ class FirebaseAuthProvider implements IAuthService {
 
       // Use authenticate() instead of signIn()
       final account = await gsi.authenticate();
-
-      if (account == null) {
-        // User cancelled sign-in
-        return null;
-      }
 
       final idToken = account.authentication.idToken;
       if (idToken == null) {

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:infinitynotes/services/auth/auth_service.dart';
+// import 'package:infinitynotes/services/auth/auth_service.dart';
 import 'package:infinitynotes/utilities/generics/ui/animation/animation_controller.dart';
 import 'package:infinitynotes/utilities/generics/ui/ui_constants.dart';
 import 'package:infinitynotes/views/menu/menu_view.dart';
 import 'search_bar.dart' as custom;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:infinitynotes/services/profile/profile_cubit.dart';
+import 'package:infinitynotes/services/profile/user_profile.dart';
 
 class CustomSliverAppBar extends StatefulWidget {
   final String? title;
@@ -28,8 +31,6 @@ class CustomSliverAppBar extends StatefulWidget {
   final VoidCallback? onLogout;
   final VoidCallback? onProfile;
   final VoidCallback? onSettings;
-  final VoidCallback? onReportBug;
-  final VoidCallback? onFeedback;
 
   const CustomSliverAppBar({
     super.key,
@@ -55,8 +56,6 @@ class CustomSliverAppBar extends StatefulWidget {
     this.onLogout,
     this.onProfile,
     this.onSettings,
-    this.onFeedback,
-    this.onReportBug,
   });
 
   @override
@@ -108,7 +107,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
 
   void _checkAndPlayAnimation() {
     if (GlobalAnimationController.shouldShowTitleAnimation() && mounted) {
-      debugPrint("Starting title animation...");
+      debugPrint('Starting title animation...');
 
       setState(() {
         _showTitle = true;
@@ -125,13 +124,13 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
                 _showTitle = false;
                 _isAnimating = false;
               });
-              debugPrint("Animation complete!");
+              debugPrint('Animation complete!');
             }
           });
         }
       });
     } else {
-      debugPrint("🎯 ❌ No animation - showing search directly");
+      debugPrint('🎯 ❌ No animation - showing search directly');
       setState(() {
         _showTitle = false;
         _isAnimating = false;
@@ -181,25 +180,27 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
   }
 
   Widget _buildNormalMode() {
+    final theme = Theme.of(context);
+
     return Container(
       height: kToolbarHeight - 4,
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
+        color: theme.colorScheme.primary,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withAlpha(102),
+          color: theme.colorScheme.primary.withAlpha(102),
           width: 1.2,
         ),
         boxShadow: UIConstants.containerShadow,
       ),
       alignment: Alignment.center,
       child: Text(
-        widget.title ?? "Infinity Notes",
+        widget.title ?? 'Infinity Notes',
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: Theme.of(context).colorScheme.onPrimary,
+          color: theme.colorScheme.onPrimary,
           letterSpacing: 0.5,
           shadows: UIConstants.textShadow,
         ),
@@ -222,9 +223,13 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
   }
 
   Widget _buildProfileMenu() {
-    final user = AuthService.firebase().currentUser;
-    final displayName = user?.displayName;
-    final photoURL = user?.photoURL;
+    final profileState = context.watch<ProfileCubit>().state;
+    final profile = profileState.profile;
+
+    final displayName = profile?.fullName;
+    final photoURL = profile?.photoUrl;
+
+    final theme = Theme.of(context);
 
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
@@ -239,8 +244,6 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
                 onLogout: widget.onLogout,
                 onProfile: widget.onProfile,
                 onSettings: widget.onSettings,
-                onReportBug: widget.onReportBug,
-                onFeedback: widget.onFeedback,
               ),
             ),
           );
@@ -250,7 +253,7 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Theme.of(context).colorScheme.inversePrimary.withAlpha(200),
+              color: theme.colorScheme.inversePrimary.withAlpha(200),
               width: 1.5,
             ),
             boxShadow: UIConstants.strongShadow,
@@ -261,13 +264,13 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
             backgroundImage: photoURL != null && photoURL.isNotEmpty
                 ? NetworkImage(photoURL)
                 : null,
-            child: photoURL == null || photoURL.isEmpty
+            child: (photoURL == null || photoURL.isEmpty)
                 ? Text(
               _getInitial(displayName, widget.userEmail),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w900,
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 shadows: UIConstants.textShadow,
               ),
             )
@@ -279,9 +282,9 @@ class _CustomSliverAppBarState extends State<CustomSliverAppBar>
   }
 
   String _getInitial(String? displayName, String email) {
-    if (displayName != null && displayName.isNotEmpty) {
-      return displayName[0].toUpperCase();
+    if (displayName != null && displayName.trim().isNotEmpty) {
+      return displayName.trim()[0].toUpperCase();
     }
-    return email.isNotEmpty ? email[0].toUpperCase() : "U";
+    return email.isNotEmpty ? email[0].toUpperCase() : 'U';
   }
 }

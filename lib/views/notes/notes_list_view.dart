@@ -19,7 +19,9 @@ class NotesListView extends StatelessWidget {
     if (PlatformUtils.isWeb ||
         PlatformUtils.isWindows ||
         PlatformUtils.isMacOS ||
-        PlatformUtils.isLinux) return 3;
+        PlatformUtils.isLinux) {
+      return 3;
+    }
     return 1; // Mobile platforms
   }
 
@@ -80,7 +82,9 @@ class SliverNotesListView extends StatelessWidget {
     if (PlatformUtils.isWeb ||
         PlatformUtils.isWindows ||
         PlatformUtils.isMacOS ||
-        PlatformUtils.isLinux) return 3;
+        PlatformUtils.isLinux) {
+      return 3;
+    }
     return 1;
   }
 

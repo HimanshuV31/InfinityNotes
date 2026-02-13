@@ -54,12 +54,12 @@ class _RegisterViewState extends State<RegisterView> {
   }
 
   Future<void> register() async {
-    final _email = _emailController.text.trim();
-    final _password = _passwordController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
     if (!_formKey.currentState!.validate()) return;
     if (!_passwordsMatch) return;
     context.read<AuthBloc>().add(
-      AuthEventRegister(email: _email, password: _password),
+      AuthEventRegister(email: email, password: password),
     );
   }
 

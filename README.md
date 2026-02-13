@@ -149,7 +149,7 @@ flutter build appbundle --release
 
 
 ### **Download from Google Play** (Recommended)
-- **Current Version**: 1.0.5 (Build 7)
+- **Current Version**: 1.0.7 (Build 9)
 - **Status**: Open Testing
 - **Join Beta**: [Opt-in URL](https://play.google.com/store/apps/details?id=com.ehv.infinitynotes)
 

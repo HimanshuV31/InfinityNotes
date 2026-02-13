@@ -1,8 +1,8 @@
 import 'package:infinitynotes/services/auth/auth_user.dart';
 import 'package:test/test.dart';
 
-import '../lib/services/auth/auth_exception.dart';
-import '../lib/services/auth/auth_provider.dart';
+import 'package:infinitynotes/services/auth/auth_exception.dart';
+import 'package:infinitynotes/services/auth/auth_provider.dart';
 
 void main() {
   group('Mock Authentication', () {

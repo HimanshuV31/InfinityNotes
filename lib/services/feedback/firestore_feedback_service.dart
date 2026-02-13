@@ -62,14 +62,14 @@ class FirestoreFeedbackService {
       'note': 'Full device details will be available in future updates',
     };
 
-    /* //Original Implementation
+    /*//Original Implementation
     if (!_useDeviceInfo) {
       return {
         'platform': kIsWeb
             ? 'Web'
             : (PlatformUtils.isAndroid
-            ? 'Android'
-            : (PlatformUtils.isIOS ? 'iOS' : 'Desktop')),
+                  ? 'Android'
+                  : (PlatformUtils.isIOS ? 'iOS' : 'Desktop')),
         'version': 'Unknown',
         'device': 'Information temporarily unavailable',
         'note': 'Full device details will be available in future updates',
@@ -79,10 +79,7 @@ class FirestoreFeedbackService {
     final deviceInfo = DeviceInfoPlugin();
 
     if (kIsWeb) {
-      return {
-        'platform': 'Web',
-        'device': 'Browser',
-      };
+      return {'platform': 'Web', 'device': 'Browser'};
     }
 
     if (PlatformUtils.isAndroid) {
@@ -105,11 +102,7 @@ class FirestoreFeedbackService {
       };
     }
 
-    return {
-      'platform': 'Desktop',
-      'device': 'Unknown',
-    };
-
-     */
+    return {'platform': 'Desktop', 'device': 'Unknown'};
+    */
   }
 }

@@ -5,17 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:infinitynotes/services/platform/platform_utils.dart';
 
-enum EmailJSFeedbackType {
-  bugReport,
-  generalFeedback,
-}
+enum EmailJSFeedbackType { bugReport, generalFeedback }
 
 class EmailJSFeedbackService {
   static const String serviceId = 'service_emailfeedback';
   static const String templateId = 'template_feedback';
   static const String publicKey = 'FrqsP6FVsfWpMRsFw';
   static const String supportEmail = 'himanshuv31.dev@gmail.com';
-  static const String apiEndpoint = 'https://api.emailjs.com/api/v1.0/email/send';
+  static const String apiEndpoint =
+      'https://api.emailjs.com/api/v1.0/email/send';
 
   // Now that device_info_plus is stable again, turn this on
   static const bool _useDeviceInfo = false;
@@ -72,7 +70,9 @@ class EmailJSFeedbackService {
         body: json.encode(requestBody),
       );
 
-      debugPrint('📬 EmailJS Response: ${response.statusCode} - ${response.body}');
+      debugPrint(
+        '📬 EmailJS Response: ${response.statusCode} - ${response.body}',
+      );
 
       return response.statusCode == 200;
     } catch (error) {
@@ -81,12 +81,12 @@ class EmailJSFeedbackService {
     }
   }
 
-  static Future<String> _getDeviceInfo() async {
+  static Future<Object> _getDeviceInfo() async {
     // TEMP: device_info_plus disabled due to AGP compatibility
     return 'Platform: ${kIsWeb ? 'Web' : (PlatformUtils.isAndroid ? 'Android' : (PlatformUtils.isIOS ? 'iOS' : 'Desktop'))}\n'
         'Device: Information temporarily unavailable\n'
         'Note: Full device details will be available in future updates';
-    /* //The Original Implementation
+    /*//The Original Implementation
     if (!_useDeviceInfo) {
       return 'Platform: ${kIsWeb ? 'Web' : (PlatformUtils.isAndroid ? 'Android' : (PlatformUtils.isIOS ? 'iOS' : 'Desktop'))}\n'
           'Device: Information temporarily unavailable\n'
@@ -107,14 +107,9 @@ class EmailJSFeedbackService {
       return 'Platform: iOS ${iosInfo.systemVersion}\n'
           'Device: ${iosInfo.model}\n'
           'Name: ${iosInfo.name}';
-    }
-
-    return {
-    'Platform: Desktop',
-    'Device: Unknown'
-    };
-
-     */
+    } else {
+      return {'Platform: Desktop', 'Device: Unknown'};
+    }*/
   }
 
   static Future<String> _getAppInfo() async {

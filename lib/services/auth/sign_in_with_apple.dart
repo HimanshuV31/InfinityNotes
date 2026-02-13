@@ -1,6 +1,5 @@
 import 'dart:developer' as developer;
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:infinitynotes/services/auth/auth_exception.dart';
@@ -60,7 +59,7 @@ Future<UserCredential?> signInWithApple() async {
     developer.log('🍎 Step 2: Got Apple credential', name: 'AppleSignIn');
     developer.log('  - User ID: ${appleCredential.userIdentifier}', name: 'AppleSignIn');
     developer.log('  - Identity Token: ${appleCredential.identityToken != null ? "EXISTS" : "NULL"}', name: 'AppleSignIn');
-    developer.log('  - Auth Code: ${appleCredential.authorizationCode != null ? "EXISTS" : "NULL"}', name: 'AppleSignIn');
+    developer.log('  - Auth Code: ${"EXISTS"}', name: 'AppleSignIn');
 
     // ✅ FIX: Check for null identityToken (iOS simulator bug)
     if (appleCredential.identityToken == null) {
