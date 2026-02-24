@@ -66,10 +66,10 @@ class ProfileCubit extends Cubit<ProfileState> {
       final firstName = names.isNotEmpty && names.first.isNotEmpty
           ? names.first
           : 'User';
-      final lastName =
-      names.length > 1 ? names.sublist(1).join(' ') : null;
+      final lastName = names.length > 1 ? names.sublist(1).join(' ') : null;
 
       final newProfile = UserProfile(
+        userId: user.uid, // ✅ ADD userId here
         firstName: firstName,
         lastName: lastName,
         photoUrl: user.photoURL,

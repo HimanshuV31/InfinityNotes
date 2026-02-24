@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:infinitynotes/services/auth/auth_exception.dart';
-
+import 'package:infinitynotes/services/notifications/notification_service.dart';
 
 /// Apple Sign-In Implementation
 ///
@@ -13,6 +13,7 @@ import 'package:infinitynotes/services/auth/auth_exception.dart';
 /// - Firebase OAuth redirect URI configured
 /// - Code structure complete
 /// - Error handling implemented
+/// - Notification initialization added
 ///
 /// ❌ NEEDS APPLE DEVELOPER ACCOUNT:
 /// - Service ID: com.ehv.infinitynotes.firebase (placeholder)
@@ -28,9 +29,6 @@ import 'package:infinitynotes/services/auth/auth_exception.dart';
 /// - iOS simulator: Will fail (requires Apple Developer config)
 /// - Android: Will work once Service ID added
 /// - Email/Google Sign-In: ✅ Working alternatives
-
-
-
 
 Future<UserCredential?> signInWithApple() async {
   try {
@@ -48,9 +46,9 @@ Future<UserCredential?> signInWithApple() async {
         // TODO: Replace with actual Service ID from Apple Developer Portal
         // Format: com.ehv.infinitynotes.firebase
         // See: APPLE_SIGN_IN_CONFIG.md
-        clientId: "com.ehv.infinityNotes.firebase", // PLACEHOLDER - Will work once Apple Developer setup complete
+        clientId: "com.ehv.infinityNotes.firebase", // PLACEHOLDER
         redirectUri: Uri.parse(
-          "https://infinity-notes-3101.firebaseapp.com/__/auth/handler", // ✅ Ready to use
+          "https://infinity-notes-3101.firebaseapp.com/__/auth/handler", // ✅ Ready
         ),
       )
           : null,
@@ -59,7 +57,7 @@ Future<UserCredential?> signInWithApple() async {
     developer.log('🍎 Step 2: Got Apple credential', name: 'AppleSignIn');
     developer.log('  - User ID: ${appleCredential.userIdentifier}', name: 'AppleSignIn');
     developer.log('  - Identity Token: ${appleCredential.identityToken != null ? "EXISTS" : "NULL"}', name: 'AppleSignIn');
-    developer.log('  - Auth Code: ${"EXISTS"}', name: 'AppleSignIn');
+    developer.log('  - Auth Code: EXISTS', name: 'AppleSignIn');
 
     // ✅ FIX: Check for null identityToken (iOS simulator bug)
     if (appleCredential.identityToken == null) {
@@ -78,12 +76,22 @@ Future<UserCredential?> signInWithApple() async {
     developer.log('🍎 Step 4: Signing in with Firebase...', name: 'AppleSignIn');
 
     // Sign in with Firebase
-    final userCredential =
-    await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+    final userCredential = await FirebaseAuth.instance.signInWithCredential(oauthCredential);
 
     developer.log('🍎 Step 5: SUCCESS! User UID: ${userCredential.user?.uid}', name: 'AppleSignIn');
 
+    // ═══════════════════════════════════════════════════════════
+    // 🔔 NEW: Initialize notifications after successful sign-in
+    // ═══════════════════════════════════════════════════════════
+    final user = userCredential.user;
+    if (user != null) {
+      developer.log('🔔 Step 6: Initializing notifications...', name: 'AppleSignIn');
+      await NotificationService().initialize(user.uid);
+      developer.log('🔔 Step 6: Notifications initialized', name: 'AppleSignIn');
+    }
+
     return userCredential;
+
   } on FirebaseAuthException catch (e) {
     // Firebase-specific errors (network, invalid credential, etc.)
     developer.log('🔥 Firebase Auth Error: ${e.code} - ${e.message}', name: 'AppleSignIn', error: e);

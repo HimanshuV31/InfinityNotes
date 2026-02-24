@@ -6,44 +6,88 @@ version: 1.0.7+9
 
 environment:
   sdk: ^3.8.1
-
+# Any Random Text
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  firebase_core: ^4.0.0
-  firebase_auth: ^6.0.1
-  cloud_firestore: ^6.0.0
-  firebase_storage: ^13.0.0
-  rename_app: ^1.6.5
-  google_sign_in: ^7.2.0
-  sign_in_with_apple: ^7.0.1
-  sqflite: ^2.4.2
-  path_provider: ^2.1.5
-  path: ^1.9.1
-  flutter_staggered_grid_view: ^0.7.0
-  share_plus: ^12.0.1
-  bloc: ^9.0.0
-  flutter_bloc: ^9.1.1
-  equatable: ^2.0.3
-  go_router: ^17.0.1
-#  flutter_localization: ^0.3.3
-  intl: ^0.20.2
-  shared_preferences: ^2.2.2
-  url_launcher: ^6.2.1
-  flutter_linkify: ^6.0.0
-  http: ^1.2.0
-  flutter_secure_storage: ^10.0.0
-  package_info_plus: ^9.0.0  # Get app version info
-#  device_info_plus: ^12.3.0
-  emailjs: ^4.0.0
-  provider: ^6.1.1
-  cached_network_image: ^3.3.0
-  app_links: ^7.0.0
-  connectivity_plus: ^7.0.0
-  get_it: ^9.2.0
-  flutter_dotenv: ^6.0.0
-  flutter_markdown_plus: ^1.0.7
+
+  # ═══════════════════════════════════════════════════════════
+  # 🔥 FIREBASE BACKEND SERVICES
+  # ═══════════════════════════════════════════════════════════
+  cloud_firestore: ^6.1.2           # NoSQL cloud database
+  firebase_auth: ^6.1.4              # User authentication
+  firebase_core: ^4.0.0              # Firebase initialization
+  firebase_messaging: ^16.1.1        # Push notifications (FCM)
+  firebase_storage: ^13.0.6          # File storage (images, etc.)
+
+  # ═══════════════════════════════════════════════════════════
+  # 🔐 AUTHENTICATION PROVIDERS
+  # ═══════════════════════════════════════════════════════════
+  google_sign_in: ^7.2.0             # Google OAuth
+  sign_in_with_apple: ^7.0.1         # Apple Sign-In
+
+  # ═══════════════════════════════════════════════════════════
+  # 🧠 STATE MANAGEMENT & DEPENDENCY INJECTION
+  # ═══════════════════════════════════════════════════════════
+  bloc: ^9.2.0                       # BLoC pattern core
+  equatable: ^2.0.8                  # Value equality for BLoC states
+  flutter_bloc: ^9.1.1               # BLoC Flutter integration
+  get_it: ^9.2.0                     # Service locator (DI)
+  provider: ^6.1.1                   # Lightweight state management
+
+  # ═══════════════════════════════════════════════════════════
+  # 🧭 NAVIGATION & DEEP LINKING
+  # ═══════════════════════════════════════════════════════════
+  app_links: ^7.0.0                  # Deep linking (Universal Links)
+  go_router: ^17.1.0                 # Declarative routing
+
+  # ═══════════════════════════════════════════════════════════
+  # 💾 LOCAL STORAGE & PERSISTENCE
+  # ═══════════════════════════════════════════════════════════
+  flutter_secure_storage: ^10.0.0    # Encrypted storage (tokens, keys)
+  path: ^1.9.1                       # Path manipulation utilities
+  path_provider: ^2.1.5              # File system paths
+  shared_preferences: ^2.2.2         # Key-value storage (settings)
+  sqflite: ^2.4.2                    # SQLite database
+
+  # ═══════════════════════════════════════════════════════════
+  # 🔔 NOTIFICATIONS & PERMISSIONS
+  # ═══════════════════════════════════════════════════════════
+  flutter_local_notifications: ^20.1.0  # Local notification display
+  permission_handler: ^12.0.1           # Runtime permissions (Android/iOS)
+
+  # ═══════════════════════════════════════════════════════════
+  # 🎨 UI COMPONENTS & WIDGETS
+  # ═══════════════════════════════════════════════════════════
+  cached_network_image: ^3.3.0       # Image caching & optimization
+  cupertino_icons: ^1.0.8            # iOS-style icons
+  flutter_markdown_plus: ^1.0.7      # Markdown rendering
+  flutter_staggered_grid_view: ^0.7.0  # Pinterest-style grids
+
+  # ═══════════════════════════════════════════════════════════
+  # 🛠️ UTILITIES & HELPERS
+  # ═══════════════════════════════════════════════════════════
+  connectivity_plus: ^7.0.0          # Network connectivity checks
+  emailjs: ^4.0.0                    # Email service integration
+  flutter_dotenv: ^6.0.0             # Environment variables (.env)
+  flutter_linkify: ^6.0.0            # Auto-detect & linkify URLs
+  http: ^1.2.0                       # HTTP client
+  intl: ^0.20.2                      # Internationalization & formatting
+  package_info_plus: ^9.0.0          # App version/build info
+  share_plus: ^12.0.1                # System share dialog
+  url_launcher: ^6.2.1               # Open URLs/emails/calls
+
+  # ═══════════════════════════════════════════════════════════
+  # 🔧 DEVELOPMENT TOOLS
+  # ═══════════════════════════════════════════════════════════
+  rename_app: ^1.6.5                 # App renaming utility
+
+  # ═══════════════════════════════════════════════════════════
+  # 🚧 COMMENTED OUT (Future/Testing)
+  # ═══════════════════════════════════════════════════════════
+  # device_info_plus: ^12.3.0        # Device hardware info (analytics)
+  # flutter_localization: ^0.3.3     # Multi-language support (Phase 2)
+
 
 dev_dependencies:
   flutter_test:
@@ -51,7 +95,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_native_splash: ^2.4.7
   flutter_launcher_icons: 0.14.4
-  test: ^1.25.15
+  test: ^1.26.3
 
 
 flutter:

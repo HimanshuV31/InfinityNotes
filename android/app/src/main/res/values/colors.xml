@@ -3,4 +3,5 @@
     <color name="ic_launcher_background">#3993ad</color>
     <color name="splash_bg">#3993ad</color>
     <color name="splash_bg_night">#3993ad</color>
+    <color name="notification_color">#3993ad</color>
 </resources>

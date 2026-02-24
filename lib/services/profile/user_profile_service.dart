@@ -111,6 +111,7 @@ class UserProfileService {
     }
 
     return UserProfile(
+      userId: user.uid, // ✅ ADD userId here
       firstName: firstName.isEmpty ? 'User' : firstName,
       lastName: lastName,
       photoUrl: user.photoURL,

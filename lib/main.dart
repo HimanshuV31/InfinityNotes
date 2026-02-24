@@ -4,6 +4,7 @@ import 'package:app_links/app_links.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,7 @@ import 'package:infinitynotes/helpers/loading/loading_screen.dart';
 import 'package:infinitynotes/services/auth/bloc/auth_bloc.dart';
 import 'package:infinitynotes/services/auth/bloc/auth_event.dart';
 import 'package:infinitynotes/services/auth/bloc/auth_state.dart';
+import 'package:infinitynotes/services/notifications/notification_service.dart';
 import 'package:infinitynotes/services/platform/app_version.dart';
 import 'package:infinitynotes/services/profile/profile_cubit.dart';
 import 'package:infinitynotes/services/theme/theme_notifier.dart';
@@ -28,6 +30,7 @@ import 'package:infinitynotes/views/verify_email_view.dart';
 // GLOBAL DEEP LINK MANAGEMENT
 // ============================================================================
 final _appLinks = AppLinks();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 String? _pendingDeepLink;
 StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
@@ -36,7 +39,14 @@ StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 // ============================================================================
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Must be registered before Firebase.initializeApp()
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
   await _initializeApp();
+
+  // Set navigator key before UI renders
+  NotificationService.setNavigatorKey(navigatorKey);
 
   runApp(
     MultiProvider(
@@ -93,22 +103,23 @@ Future<void> _configureFirestore() async {
 // NETWORK CONNECTIVITY MONITORING
 // ============================================================================
 void _setupConnectivityListener() {
-  _connectivitySubscription =
-      Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
-        final hasConnection =
-        results.any((result) => result != ConnectivityResult.none);
+  _connectivitySubscription = Connectivity()
+      .onConnectivityChanged
+      .listen((List<ConnectivityResult> results) {
+    final hasConnection =
+    results.any((result) => result != ConnectivityResult.none);
 
-        if (hasConnection) {
-          debugPrint('🌐 Network restored: $results');
-          FirebaseFirestore.instance.enableNetwork().catchError((e) {
-            debugPrint('⚠️ Failed to reconnect Firestore: $e');
-          });
-        } else {
-          debugPrint('🚫 Network disconnected');
-        }
-      }, onError: (error) {
-        debugPrint('⚠️ Connectivity listener error: $error');
+    if (hasConnection) {
+      debugPrint('🌐 Network restored: $results');
+      FirebaseFirestore.instance.enableNetwork().catchError((e) {
+        debugPrint('⚠️ Failed to reconnect Firestore: $e');
       });
+    } else {
+      debugPrint('🚫 Network disconnected');
+    }
+  }, onError: (error) {
+    debugPrint('⚠️ Connectivity listener error: $error');
+  });
 }
 
 // ============================================================================
@@ -195,6 +206,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return Consumer<ThemeNotifier>(
       builder: (context, notifier, _) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           title: 'Infinity Notes',
           debugShowCheckedModeBanner: false,
           theme: _buildLightTheme(),
@@ -223,11 +235,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           routes: {
             CreateUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
           },
-          // CRITICAL: Wrap ALL routes with ProfileCubit when logged in
           builder: (context, child) {
             return BlocBuilder<AuthBloc, AuthState>(
               builder: (context, authState) {
-                // Only provide ProfileCubit when user is logged in
                 if (authState is AuthStateLoggedIn) {
                   return BlocProvider(
                     create: (_) => ProfileCubit()..loadOrCreateProfile(),
@@ -241,7 +251,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                   );
                 }
 
-                // For non-logged-in states, no ProfileCubit needed
                 return MediaQuery(
                   data: MediaQuery.of(context).copyWith(
                     boldText: false,
@@ -275,6 +284,12 @@ class HomePage extends StatelessWidget {
           );
         } else {
           LoadingScreen().hide();
+        }
+
+        // Initialize notifications when user logs in
+        if (state is AuthStateLoggedIn) {
+          await NotificationService().initialize(state.user.id);
+          if(!context.mounted) return;
         }
 
         if (state is AuthStateNeedsEmailVerification) {

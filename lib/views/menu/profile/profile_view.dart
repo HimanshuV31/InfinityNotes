@@ -84,17 +84,19 @@ class _ProfileViewState extends State<ProfileView> {
 
   UserProfile _buildEditedProfile() {
     return UserProfile(
+      userId: _originalProfile!.userId, // ✅ preserve userId
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim().isEmpty
           ? null
           : _lastNameController.text.trim(),
-      photoUrl: _originalProfile?.photoUrl, // for now
+      photoUrl: _originalProfile?.photoUrl,
       dob: _dobController.text.trim().isEmpty
           ? null
           : _dobController.text.trim(),
       gender: _gender,
     );
   }
+
 
   bool _hasChanges(UserProfile edited) {
     if (_originalProfile == null) return true;

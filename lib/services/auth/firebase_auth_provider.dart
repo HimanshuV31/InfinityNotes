@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:infinitynotes/services/auth/auth_user.dart';
 import 'package:infinitynotes/services/auth/sign_in_with_apple.dart';
 import 'package:infinitynotes/services/platform/platform_utils.dart';
+import 'package:infinitynotes/services/notifications/notification_service.dart';
 
 class FirebaseAuthProvider implements IAuthService {
   // Store injected dependencies as final fields
@@ -77,6 +78,7 @@ class FirebaseAuthProvider implements IAuthService {
       final user = currentUser;
 
       if (user != null) {
+        await NotificationService().initialize(user.id);
         return user;
       } else {
         throw const UserNotFoundAuthException();
