@@ -1,8 +1,8 @@
 # Apple Sign-In Configuration (Pending Apple Developer Account)
 
 ## ✅ COMPLETED (Have These)
-- Firebase Project ID: `infinity-notes-3101`
-- OAuth Redirect URI: `https://infinity-notes-3101.firebaseapp.com/__/auth/handler`
+- Firebase Project ID: `infinity-notes-xxxxxx`
+- OAuth Redirect URI: `https://infinity-notes-xxxxxx.firebaseapp.com/__/auth/handler`
 - Bundle ID: `com.ehv.infinityNotes`
 
 ## ❌ PENDING (Need Apple Developer Account)
