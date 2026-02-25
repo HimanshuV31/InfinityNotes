@@ -2,6 +2,22 @@
 
 ---
 
+# 1.0.8
+
+[icon:notifications] **App Notifications**
+Receive important announcements and updates broadcast directly from the developer
+
+[icon:person] **Profile View**
+View and manage your account profile from within the app
+
+[icon:info] **About the Developer**
+Meet the maker — accessible from Settings or by tapping the App Version in Menu View
+
+[icon:bug_report] **Bug Fixes & UX Improvements**
+Various stability improvements and smoother experience across screens
+
+---
+
 # 1.0.7
 
 [icon:bug_report] **Major Bug Fixes**

@@ -319,10 +319,13 @@ class _ProfileAvatar extends StatelessWidget {
               ),
             )
                 : null,
+            // onClick: () {
+            //   // TODO: implement avatar tap
+            // },
           ),
           const SizedBox(height: 8),
           Text(
-            'Tap avatar to change (coming soon)',
+            'Tap avatar to change (feature coming soon)',
             style: theme.textTheme.bodySmall,
           ),
         ],

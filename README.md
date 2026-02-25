@@ -1,12 +1,12 @@
 # 🚀 Infinity Notes
 
-[![Version](https://img.shields.io/badge/version-1.0.4-blue)](https://github.com/HimanshuV31/infinity-notes)
+[![Version](https://img.shields.io/badge/version-1.0.8-blue)](https://github.com/HimanshuV31/infinity-notes)
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter)](https://flutter.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Enabled-FFCA28?logo=firebase)](https://firebase.google.com)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Google Play](https://img.shields.io/badge/Google%20Play-Open%20Testing-34A853?logo=google-play)](https://play.google.com/store/apps)
+[![Google Play](https://img.shields.io/badge/Google%20Play-Open%20Testing-34A853?logo=google-play)](https://play.google.com/store/apps/details?id=com.ehv.infinitynotes)
 
-**A production-grade, cross-platform notes app with AI-powered summarization, real-time cloud sync, and adaptive theming.**
+**A production-grade, cross-platform notes app with AI-powered summarization, real-time cloud sync, push notifications, and adaptive theming.**
 
 Developed by **Himanshu Vaishnav** | [LinkedIn](https://linkedin.com/in/himanshuv31) | [GitHub](https://github.com/HimanshuV31)
 
@@ -32,6 +32,14 @@ Developed by **Himanshu Vaishnav** | [LinkedIn](https://linkedin.com/in/himanshu
 - **Multi-Device Support**: Seamless experience across phones and tablets
 - **Data Persistence**: Local storage with SharedPreferences and Firestore
 
+### 🔔 **Notifications**
+- **Developer Broadcasts**: Receive important announcements and app updates directly from the developer
+- **In-App Delivery**: Notifications surface seamlessly within the app experience
+
+### 👤 **Profile & Identity**
+- **Profile View**: View your account profile and identity within the app
+- **About the Developer**: Meet the maker — accessible via Settings or by tapping App Version in Menu View
+
 ### 🔐 **Secure Authentication**
 - **Google Sign-In**: One-tap OAuth authentication
 - **Apple Sign-In**: Native iOS authentication (iOS only)
@@ -48,6 +56,7 @@ Developed by **Himanshu Vaishnav** | [LinkedIn](https://linkedin.com/in/himanshu
 - **Theme Switcher**: Toggle between Light, Dark, and System themes
 - **Bug Reporting**: Integrated EmailJS feedback system with device diagnostics
 - **App Version Display**: Real-time version tracking with What's New dialog
+- **About the Developer**: Accessible from Settings screen
 - **Persistent Preferences**: Theme and view mode selection saved locally
 
 ---
@@ -70,18 +79,18 @@ Infinity Notes follows **Clean Architecture** principles with clear separation o
         - `auth_provider.dart` - Interface contract
         - `firebase_auth_provider.dart` - Firebase adapter implementation
     - **`cloud/`** - Firestore CRUD operations
+    - **`notifications/`** - Firebase Cloud Messaging for developer broadcasts
     - **`search/`** - Search BLoC with debounced input
     - **`theme/`** - ThemeNotifier with SharedPreferences persistence
     - **`feedback/`** - EmailJS integration for bug reports
 - **`utilities/`** - Cross-cutting concerns
     - `generics/ui/` - Reusable custom widgets (SearchBar, ProfileDrawer, etc.)
-- **`views/`** - Feature-specific UI screens (Login, Notes, Settings)
+- **`views/`** - Feature-specific UI screens (Login, Notes, Settings, Profile)
 
 **Key Files:**
 - `main.dart` - App entry point with BLoC and Provider setup
 - `constants/routes.dart` - Named route definitions
 - `constants/api_keys.dart` - API key management (gitignored)
-
 
 ### 🎯 **Design Patterns**
 - **BLoC Pattern**: Event-driven state management for auth and search
@@ -99,6 +108,7 @@ Infinity Notes follows **Clean Architecture** principles with clear separation o
 | **Framework**        | Flutter 3.x, Dart 3.x                           |
 | **State Management** | BLoC 8.x, Provider 6.x                          |
 | **Backend**          | Firebase Auth, Firestore, Firebase Storage      |
+| **Notifications**    | Firebase Cloud Messaging (FCM)                  |
 | **AI Integration**   | Google Gemini 2.5 Flash API                     |
 | **Local Storage**    | SharedPreferences, SQLite (via Firestore cache) |
 | **Networking**       | HTTP package for REST API calls                 |
@@ -118,7 +128,7 @@ Infinity Notes follows **Clean Architecture** principles with clear separation o
 ### **Local Development Setup**
 
 1. **Install Flutter dependencies**
-   flutter pub get
+    flutter pub get
 
 2. **Firebase Configuration**
 - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
@@ -126,34 +136,38 @@ Infinity Notes follows **Clean Architecture** principles with clear separation o
 - Place files in `android/app/` and `ios/Runner/` respectively
 - Enable **Email/Password**, **Google Sign-In**, and **Apple Sign-In** in Firebase Authentication
 - Create a **Firestore Database** with default security rules
+- Enable **Firebase Cloud Messaging** for push notifications
 
-1. **API Keys Configuration**
+3. **API Keys Configuration**
 - Create `lib/[DIRECTORIES...]/api_keys.dart`:
-  ```
+  ```dart
   String GeminiAPIKey() => 'YOUR_GEMINI_API_KEY_HERE';
   ```
 - **Important**: Add `api_keys.dart` to `.gitignore` to prevent accidental commits
 
-1. **Build and Run**
-   Debug mode
-   flutter run
+4. **Build and Run**
+```bash
+# Debug mode
+flutter run
 
-Release mode (production build)
+# Release mode
 flutter run --release
 
-Build APK
+# Build APK
 flutter build apk --release
 
-Build App Bundle (for Play Store)
+# Build App Bundle (for Play Store)
 flutter build appbundle --release
-
+```
 
 ### **Download from Google Play** (Recommended)
-- **Current Version**: 1.0.7 (Build 9)
-- **Status**: Open Testing
-- **Join Beta**: [Opt-in URL](https://play.google.com/store/apps/details?id=com.ehv.infinitynotes)
+**Current Version** : 1.0.8 (Build 10)
 
-*Production release coming soon to Google Play Store.*
+**Status** : Open Testing
 
----
+**Join Beta on Play Store** : [Opt-in URL](https://play.google.com/store/apps/details?id=com.ehv.infinitynotes)
+
+### Production release coming soon to Google Play Store.
+
+
 

@@ -2,7 +2,7 @@ name: infinitynotes
 description: "Infinity Notes app."
 publish_to: 'none'
 
-version: 1.0.7+9
+version: 1.0.8+10
 
 environment:
   sdk: ^3.8.1
@@ -75,7 +75,7 @@ dependencies:
   intl: ^0.20.2                      # Internationalization & formatting
   package_info_plus: ^9.0.0          # App version/build info
   share_plus: ^12.0.1                # System share dialog
-  url_launcher: ^6.2.1               # Open URLs/emails/calls
+  url_launcher: ^6.3.2               # Open URLs/emails/calls
 
   # ═══════════════════════════════════════════════════════════
   # 🔧 DEVELOPMENT TOOLS

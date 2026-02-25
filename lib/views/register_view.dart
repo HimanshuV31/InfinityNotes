@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinitynotes/helpers/loading/loading_screen.dart';
 import 'package:infinitynotes/services/auth/auth_exception.dart';
@@ -137,125 +138,131 @@ class _RegisterViewState extends State<RegisterView> {
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
-            child: ListView(
-              children: [
-                // Email
-                TextFormField(
-                  controller: _emailController,
-                  autofocus: true,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    suffixIcon: Icon(
-                      _isEmailValid ? Icons.check_circle : Icons.cancel,
-                      color: _isEmailValid ? Colors.green : Colors.red,
-                    ),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  onChanged: (value) {
-                    setState(() {
-                      _isEmailValid = isValidEmail(value.trim());
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    } else if (!isValidEmail(value.trim())) {
-                      return 'Enter a valid email address';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-
-                // Password
-                TextFormField(
-                  controller: _passwordController,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(labelText: "Password"),
-                  obscureText: !_isPasswordVisible,
-                  onChanged: (value) {
-                    _validatePassword(value);
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    } else if (!_hasUpperCase ||
-                        !_hasLowerCase ||
-                        !_hasNumber ||
-                        !_hasSpecialChar ||
-                        !_hasMinLength) {
-                      return 'Password does not meet all criteria';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-
-                // Confirm Password
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  decoration: InputDecoration(
-                    labelText: "Confirm Password",
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isConfirmPasswordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+            child: AutofillGroup(
+              child: ListView(
+                children: [
+                  // Email
+                  TextFormField(
+                    controller: _emailController,
+                    autofocus: true,
+                    textInputAction: TextInputAction.next,
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      suffixIcon: Icon(
+                        _isEmailValid ? Icons.check_circle : Icons.cancel,
+                        color: _isEmailValid ? Colors.green : Colors.red,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isConfirmPasswordVisible =
-                          !_isConfirmPasswordVisible;
-                        });
-                      },
                     ),
+                    keyboardType: TextInputType.emailAddress,
+                    autofillHints: const [AutofillHints.email],
+                    onChanged: (value) {
+                      setState(() {
+                        _isEmailValid = isValidEmail(value.trim());
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      } else if (!isValidEmail(value.trim())) {
+                        return 'Enter a valid email address';
+                      }
+                      return null;
+                    },
                   ),
-                  obscureText: !_isConfirmPasswordVisible,
-                  onChanged: (value) {
-                    setState(() {
-                      _passwordsMatch = value == _passwordController.text;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Confirm your password';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 15),
-
-                // Password Criteria
-                _buildPasswordCriteria(
-                  "At least 1 uppercase letter",
-                  _hasUpperCase,
-                ),
-                _buildPasswordCriteria(
-                  "At least 1 lowercase letter",
-                  _hasLowerCase,
-                ),
-                _buildPasswordCriteria("At least 1 number", _hasNumber),
-                _buildPasswordCriteria("Minimum 8 characters", _hasMinLength),
-                _buildPasswordCriteria(
-                  "At least 1 special character",
-                  _hasSpecialChar,
-                ),
-                _buildPasswordCriteria("Passwords match", _passwordsMatch),
-
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: register,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: backgroundColor,
-                    foregroundColor: foregroundColor,
+                  const SizedBox(height: 20),
+              
+                  // Password
+                  TextFormField(
+                    controller: _passwordController,
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(labelText: "Password"),
+                    obscureText: !_isPasswordVisible,
+                    autofillHints: const [AutofillHints.newPassword],
+                    onChanged: (value) {
+                      _validatePassword(value);
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      } else if (!_hasUpperCase ||
+                          !_hasLowerCase ||
+                          !_hasNumber ||
+                          !_hasSpecialChar ||
+                          !_hasMinLength) {
+                        return 'Password does not meet all criteria';
+                      }
+                      return null;
+                    },
                   ),
-                  child: const Text("Register"),
-                ),
-              ],
+                  const SizedBox(height: 10),
+              
+                  // Confirm Password
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    decoration: InputDecoration(
+                      labelText: "Confirm Password",
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordVisible =
+                            !_isConfirmPasswordVisible;
+                          });
+                        },
+                      ),
+                    ),
+                    obscureText: !_isConfirmPasswordVisible,
+                    autofillHints: const [AutofillHints.password],
+                    onChanged: (value) {
+                      setState(() {
+                        _passwordsMatch = value == _passwordController.text;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Confirm your password';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                    onFieldSubmitted: (_) => register(),
+                  ),
+                  const SizedBox(height: 15),
+              
+                  // Password Criteria
+                  _buildPasswordCriteria(
+                    "At least 1 uppercase letter",
+                    _hasUpperCase,
+                  ),
+                  _buildPasswordCriteria(
+                    "At least 1 lowercase letter",
+                    _hasLowerCase,
+                  ),
+                  _buildPasswordCriteria("At least 1 number", _hasNumber),
+                  _buildPasswordCriteria("Minimum 8 characters", _hasMinLength),
+                  _buildPasswordCriteria(
+                    "At least 1 special character",
+                    _hasSpecialChar,
+                  ),
+                  _buildPasswordCriteria("Passwords match", _passwordsMatch),
+              
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: register,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: backgroundColor,
+                      foregroundColor: foregroundColor,
+                    ),
+                    child: const Text("Register"),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -119,8 +119,22 @@ class NotificationService {
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
 
+    // ✅ CREATE NOTIFICATION CHANNEL (required for foreground notifications)
+    const androidChannel = AndroidNotificationChannel(
+      'infinity_notes_channel',
+      'Infinity Notes',
+      description: 'Important app updates and announcements',
+      importance: Importance.high,
+    );
+
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(androidChannel);
+
     if (kDebugMode) print('✅ Local notifications initialized');
   }
+
 
   // ============================================================================
   // PRIVATE: SAVE DEVICE TOKEN
@@ -198,7 +212,6 @@ class NotificationService {
 
     final notification = message.notification;
     if (notification == null) return;
-
     const androidDetails = AndroidNotificationDetails(
       'infinity_notes_channel',
       'Infinity Notes',

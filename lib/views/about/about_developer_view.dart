@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutDeveloperView extends StatefulWidget {
   const AboutDeveloperView({super.key});
@@ -50,6 +51,22 @@ class _AboutDeveloperViewState extends State<AboutDeveloperView> {
           : Markdown(
         data: _markdown ?? '',
         styleSheet: MarkdownStyleSheet.fromTheme(theme),
+        onTapLink: (text, href, title) async {
+          if (href == null) return;
+
+          final uri = Uri.parse(href);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(
+              uri,
+              mode: LaunchMode.externalApplication,
+            );
+          } else {
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Could not open link: $href')),
+            );
+          }
+        },
       ),
     );
   }
