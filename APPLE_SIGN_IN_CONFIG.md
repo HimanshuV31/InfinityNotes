@@ -34,8 +34,8 @@
 ## 🔧 SETUP STEPS (When You Get Apple Developer Access)
 
 1. Create Service ID: `com.ehv.infinityNotes.firebase`
-2. Configure domains: `infinity-notes-3101.firebaseapp.com`
-3. Configure return URL: `https://infinity-notes-3101.firebaseapp.com/__/auth/handler`
+2. Configure domains: `infinity-notes-xxxxxx.firebaseapp.com`
+3. Configure return URL: `https://infinity-notes-xxxxxx.firebaseapp.com/__/auth/handler`
 4. Create Authentication Key → Download .p8 file
 5. Update Firebase Console with Team ID, Key ID, Private Key
 6. Update code with Service ID (replace placeholder)
